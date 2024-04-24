@@ -15,13 +15,16 @@
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "postbuild": "next-sitemap --config next-sitemap.config.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "push": "drizzle-kit push:pg",
+    "migrate": "drizzle-kit migrate:pg"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
     "drizzle-orm": "^0.30.8",
     "drizzle-zod": "^0.5.1",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.365.0",
     "next": "^14.0.4",
     "postgres": "^3.4.4",
@@ -39,6 +42,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/react": "^18.2.45",
     "@types/testing-library__jest-dom": "^5.14.9",
     "@typescript-eslint/eslint-plugin": "^5.62.0",

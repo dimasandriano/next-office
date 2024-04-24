@@ -5,8 +5,18 @@ import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
 import useGeneratePagination from '@/hooks/useGeneratePagination';
 import useSearchParams from '@/hooks/useSearchParams';
+import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function GET(request: NextRequest) {
+  const verify = useVerifyJwt(request);
+  if (!verify) {
+    return NextResponse.json(
+      { status: 'error', error: 'Unauthorized' },
+      {
+        status: 401,
+      },
+    );
+  }
   const { take, page, search } = useSearchParams(request);
   const data = await db
     .select()
