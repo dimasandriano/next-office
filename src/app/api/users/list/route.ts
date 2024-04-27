@@ -18,12 +18,14 @@ export async function GET(request: NextRequest) {
     );
   }
   const { take, page, search } = useSearchParams(request);
-  const data = await db
-    .select()
-    .from(users)
-    .limit(Number(take))
-    .offset((Number(page) - 1) * Number(take))
-    .where(like(users.full_name, '%' + search + '%'));
+  const data = await db.query.users.findMany({
+    where: like(users.full_name, '%' + search + '%'),
+    limit: Number(take),
+    offset: (Number(page) - 1) * Number(take),
+    with: {
+      division: true,
+    },
+  });
 
   const counts = await db
     .select({ value: count() })
