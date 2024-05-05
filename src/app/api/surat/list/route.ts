@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
     where: ilike(surat.no_surat, '%' + search + '%'),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
+    with: {
+      kategori: true,
+    },
   });
 
   const counts = await db

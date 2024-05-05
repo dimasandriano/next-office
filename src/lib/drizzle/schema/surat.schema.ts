@@ -1,4 +1,14 @@
-import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import {
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
+
+import { kategori } from '@/lib/drizzle/schema/kategori.schema';
 
 import { ESifat } from '@/enums/sifat.enum';
 import { EStatus } from '@/enums/status.enum';
@@ -12,6 +22,7 @@ export const surat = pgTable('surat', {
   sifat: ESifat('sifat'),
   pengirim: varchar('pengirim', { length: 50 }),
   peminta: varchar('peminta', { length: 50 }),
+  kategori_id: integer('kategori_id'),
   perihal: varchar('perihal', { length: 50 }),
   tgl_kegiatan: timestamp('tgl_kegiatan').notNull(),
   nama_kegiatan: varchar('nama_kegiatan', { length: 100 }),
@@ -28,3 +39,9 @@ export const surat = pgTable('surat', {
   created_by: varchar('created_by', { length: 50 }),
   created_at: timestamp('created_at').defaultNow(),
 });
+export const suratKategoriRelations = relations(surat, ({ one }) => ({
+  kategori: one(kategori, {
+    fields: [surat.kategori_id],
+    references: [kategori.id],
+  }),
+}));

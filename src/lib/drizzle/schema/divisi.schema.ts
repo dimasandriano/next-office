@@ -11,6 +11,6 @@ export const divisi = pgTable('divisi', {
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-export const divisiRelations = relations(divisi, ({ many }) => ({
+export const divisiUsersRelations = relations(divisi, ({ many }) => ({
   users: many(users),
 }));

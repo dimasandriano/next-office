@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
     where: ilike(kategori.nama, '%' + search + '%'),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
+    with: {
+      surat: true,
+    },
   });
 
   const counts = await db

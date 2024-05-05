@@ -25,7 +25,7 @@ export const users = pgTable('users', {
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-export const userRelations = relations(users, ({ one }) => ({
+export const usersDivisiRelations = relations(users, ({ one }) => ({
   division: one(divisi, {
     fields: [users.divisi_id],
     references: [divisi.id],
