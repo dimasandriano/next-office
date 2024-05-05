@@ -14,5 +14,5 @@
     "containerClassName"
   ],
   "typescript.preferences.importModuleSpecifier": "non-relative",
-  "discord.enabled": false
+  "discord.enabled": true
 }
