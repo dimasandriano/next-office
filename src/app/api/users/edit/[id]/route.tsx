@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
-import { TUsers, users } from '@/lib/drizzle/schema/users.schema';
+import { users } from '@/lib/drizzle/schema/users.schema';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 const editSchema = createInsertSchema(users, {
@@ -16,6 +16,8 @@ const editSchema = createInsertSchema(users, {
   password: z.nullable(z.string().min(3).max(200)).optional(),
 });
 import bcrypt from 'bcryptjs';
+
+import { TSchemaUsers } from '@/types/users.type';
 
 export async function PUT(
   request: NextRequest,
@@ -31,7 +33,7 @@ export async function PUT(
       },
     );
   }
-  const body = await request.json();
+  const body: TSchemaUsers = await request.json();
   const result = editSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -42,7 +44,7 @@ export async function PUT(
       { status: 400 },
     );
   }
-  const { full_name, username, password, role, is_active }: TUsers = body;
+  const { full_name, username, password, role, is_active } = body;
 
   const userID = await db.query.users.findFirst({
     where: eq(users.id, Number(id)),

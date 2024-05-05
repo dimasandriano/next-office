@@ -1,4 +1,3 @@
-import { InferModel } from 'drizzle-orm';
 import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const disposisi = pgTable('disposisi', {
@@ -10,5 +9,3 @@ export const disposisi = pgTable('disposisi', {
   created_by: varchar('created_by', { length: 50 }),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
-
-export type TDisposisi = InferModel<typeof disposisi>;

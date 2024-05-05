@@ -1,10 +1,13 @@
 import { eq } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { kategori } from '@/lib/drizzle/schema/kategori.schema';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
+import { TSchemaKategori } from '@/types/kategori.type';
+const editSchema = createInsertSchema(kategori, {});
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -32,7 +35,17 @@ export async function PUT(
     );
   }
   const body = await request.json();
-  const { nama, keterangan } = body;
+  const result = editSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      {
+        status: 'error',
+        error: result.error.issues,
+      },
+      { status: 400 },
+    );
+  }
+  const { nama, keterangan }: TSchemaKategori = body;
   const data = await db
     .update(kategori)
     .set({ nama, keterangan })

@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
-import { surat, TSurat } from '@/lib/drizzle/schema/surat.schema';
+import { surat } from '@/lib/drizzle/schema/surat.schema';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
+
+import { TSchemaSurat } from '@/types/surat.type';
 
 const createSchema = createInsertSchema(surat, {
   tgl_masuk: z.string().refine((val) => new Date(val) instanceof Date),
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest) {
       },
     );
   }
-  const body = await request.json();
+  const body: TSchemaSurat = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
     tgl_kegiatan,
     tgl_masuk,
     tipe,
-  }: TSurat = body;
+  } = body;
   const data = await db
     .insert(surat)
     .values({

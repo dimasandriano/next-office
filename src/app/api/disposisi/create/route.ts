@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
-import { disposisi, TDisposisi } from '@/lib/drizzle/schema/disposisi.schema';
+import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
+
+import { TSchemaDisposisi } from '@/types/disposisi.type';
 
 const createSchema = createInsertSchema(disposisi, {
   tgl_diterima: z.string().refine((val) => new Date(val) instanceof Date),
@@ -31,7 +33,8 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { isi, note_pengirim, note_penerima, tgl_diterima }: TDisposisi = body;
+  const { isi, note_pengirim, note_penerima, tgl_diterima }: TSchemaDisposisi =
+    body;
   const data = await db
     .insert(disposisi)
     .values({

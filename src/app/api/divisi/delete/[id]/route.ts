@@ -19,6 +19,18 @@ export async function DELETE(
       },
     );
   }
+  const cekId = await db.query.divisi.findFirst({
+    where: eq(divisi.id, Number(id)),
+  });
+
+  if (!cekId) {
+    return NextResponse.json(
+      { status: 'error', error: 'Divisi tidak ditemukan' },
+      {
+        status: 404,
+      },
+    );
+  }
   const data = await db
     .delete(divisi)
     .where(eq(divisi.id, Number(id)))

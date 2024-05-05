@@ -5,7 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
-import { TUsers, users } from '@/lib/drizzle/schema/users.schema';
+import { users } from '@/lib/drizzle/schema/users.schema';
+
+import { TSchemaUsers } from '@/types/users.type';
 
 const registerSchema = createInsertSchema(users, {
   username: z
@@ -16,9 +18,9 @@ const registerSchema = createInsertSchema(users, {
 });
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const body: TSchemaUsers = await request.json();
   const result = registerSchema.safeParse(body);
-  const { full_name, username, password, role }: TUsers = body;
+  const { full_name, username, password, role } = body;
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!result.success) {
     return NextResponse.json(

@@ -4,8 +4,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
-import { lamaran, TLamaran } from '@/lib/drizzle/schema/lamaran.schema';
+import { lamaran } from '@/lib/drizzle/schema/lamaran.schema';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
+
+import { TSchemaLamaran } from '@/types/lamaran.type';
 
 const editSchema = createInsertSchema(lamaran, {
   tgl: z.string().refine((val) => new Date(val) instanceof Date),
@@ -37,7 +39,7 @@ export async function PUT(
       },
     );
   }
-  const body = await request.json();
+  const body: TSchemaLamaran = await request.json();
   const result = editSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -60,7 +62,7 @@ export async function PUT(
     lampiran,
     files,
     created_by,
-  }: TLamaran = body;
+  } = body;
   const data = await db
     .update(lamaran)
     .set({
