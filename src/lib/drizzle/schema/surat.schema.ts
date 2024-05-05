@@ -8,6 +8,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 import { kategori } from '@/lib/drizzle/schema/kategori.schema';
 
 import { ESifat } from '@/enums/sifat.enum';
@@ -43,5 +44,12 @@ export const suratKategoriRelations = relations(surat, ({ one }) => ({
   kategori: one(kategori, {
     fields: [surat.kategori_id],
     references: [kategori.id],
+  }),
+}));
+
+export const suratDisposisiRelations = relations(surat, ({ one }) => ({
+  disposisi: one(disposisi, {
+    fields: [surat.id],
+    references: [disposisi.surat_id],
   }),
 }));

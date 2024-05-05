@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
+import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 import { users } from '@/lib/drizzle/schema/users.schema';
 
 export const divisi = pgTable('divisi', {
@@ -13,4 +14,7 @@ export const divisi = pgTable('divisi', {
 
 export const divisiUsersRelations = relations(divisi, ({ many }) => ({
   users: many(users),
+}));
+export const divisiDisposisiRelations = relations(divisi, ({ many }) => ({
+  disposisi: many(disposisi),
 }));

@@ -1,4 +1,7 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+
+import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 
 import { EStatus } from '@/enums/status.enum';
 
@@ -17,3 +20,10 @@ export const lamaran = pgTable('lamaran', {
   created_by: varchar('created_by', { length: 50 }),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
+
+export const lamaranDisposisiRelations = relations(lamaran, ({ one }) => ({
+  disposisi: one(disposisi, {
+    fields: [lamaran.id],
+    references: [disposisi.lamaran_id],
+  }),
+}));

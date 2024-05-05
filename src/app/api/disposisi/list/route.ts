@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
   const data = await db.query.disposisi.findMany({
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
+    with: {
+      divisi: true,
+    },
   });
 
   const counts = await db

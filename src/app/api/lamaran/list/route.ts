@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
   const data = await db.query.lamaran.findMany({
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
+    with: {
+      disposisi: true,
+    },
   });
 
   const counts = await db

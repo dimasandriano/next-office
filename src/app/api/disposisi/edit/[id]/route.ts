@@ -38,7 +38,7 @@ export async function PUT(
       },
     );
   }
-  const body = await request.json();
+  const body: TSchemaDisposisi = await request.json();
   const result = editSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -49,8 +49,15 @@ export async function PUT(
       { status: 400 },
     );
   }
-  const { isi, note_pengirim, note_penerima, tgl_diterima }: TSchemaDisposisi =
-    body;
+  const {
+    isi,
+    note_pengirim,
+    note_penerima,
+    tgl_diterima,
+    divisi_id,
+    lamaran_id,
+    surat_id,
+  } = body;
   const data = await db
     .update(disposisi)
     .set({
@@ -58,6 +65,9 @@ export async function PUT(
       note_pengirim,
       note_penerima,
       tgl_diterima: tgl_diterima && new Date(tgl_diterima),
+      divisi_id,
+      surat_id,
+      lamaran_id,
     })
     .where(eq(disposisi.id, Number(id)))
     .returning();

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       },
     );
   }
-  const body = await request.json();
+  const body: TSchemaDisposisi = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -33,14 +33,24 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const { isi, note_pengirim, note_penerima, tgl_diterima }: TSchemaDisposisi =
-    body;
+  const {
+    isi,
+    note_pengirim,
+    note_penerima,
+    tgl_diterima,
+    divisi_id,
+    surat_id,
+    lamaran_id,
+  } = body;
   const data = await db
     .insert(disposisi)
     .values({
       isi,
       note_pengirim,
       note_penerima,
+      divisi_id,
+      surat_id,
+      lamaran_id,
       tgl_diterima: tgl_diterima && new Date(tgl_diterima),
     })
     .returning();
