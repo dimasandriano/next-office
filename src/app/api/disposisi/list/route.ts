@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   });
 
   const counts = await db
-    .select({ value: count() })
+    .select({ value: count(disposisi.id) })
     .from(disposisi)
     .limit(Number(take));
 

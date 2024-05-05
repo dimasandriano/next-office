@@ -1,4 +1,4 @@
-import { count, like } from 'drizzle-orm';
+import { count, ilike } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
   const { take, page, search } = useSearchParams(request);
   const data = await db.query.users.findMany({
-    where: like(users.full_name, '%' + search + '%'),
+    where: ilike(users.full_name, '%' + search + '%'),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
     with: {
@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
   });
 
   const counts = await db
-    .select({ value: count() })
+    .select({ value: count(users.id) })
     .from(users)
     .limit(Number(take))
-    .where(like(users.full_name, '%' + search + '%'));
+    .where(ilike(users.full_name, '%' + search + '%'));
   const pagination = useGeneratePagination(request, counts);
   return NextResponse.json({ status: 'success', data, pagination });
 }

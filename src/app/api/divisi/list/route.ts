@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   });
 
   const counts = await db
-    .select({ value: count() })
+    .select({ value: count(divisi.id) })
     .from(divisi)
     .limit(Number(take))
     .where(ilike(divisi.nama, '%' + search + '%'));

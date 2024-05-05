@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   });
 
   const counts = await db
-    .select({ value: count() })
+    .select({ value: count(kategori.id) })
     .from(kategori)
     .limit(Number(take))
     .where(ilike(kategori.nama, '%' + search + '%'));

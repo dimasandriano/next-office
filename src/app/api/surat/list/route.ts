@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   });
 
   const counts = await db
-    .select({ value: count() })
+    .select({ value: count(surat.id) })
     .from(surat)
     .limit(Number(take))
     .where(ilike(surat.no_surat, '%' + search + '%'));
