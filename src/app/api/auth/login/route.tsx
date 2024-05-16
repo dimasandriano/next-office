@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
 
-const loginSchema = z.object({
+export const loginSchema = z.object({
   username: z
     .string()
     .min(3)

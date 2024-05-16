@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
 import * as React from 'react';
+import { Toaster } from 'react-hot-toast';
 
 import '@/styles/globals.css';
+
+import TanstackQueryProvider from '@/lib/provider/tanstack-query.provider';
+import { ThemeProvider } from '@/lib/provider/theme.provider';
 
 import { siteConfig } from '@/constant/config';
 
@@ -50,7 +54,17 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body>{children}</body>
+      <body>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='light'
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster />
+          <TanstackQueryProvider>{children}</TanstackQueryProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
