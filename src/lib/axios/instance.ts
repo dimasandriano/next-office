@@ -27,7 +27,7 @@ instance.interceptors.response.use(
     if (error.response.status === 401) {
       Cookies.remove('token');
       if (window.location.pathname !== '/login') {
-        window.location.reload();
+        window.location.assign('/login');
       }
       return Promise.reject(error);
     }

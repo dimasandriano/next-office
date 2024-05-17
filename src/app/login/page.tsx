@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -25,20 +26,21 @@ import { authService } from '@/services/auth.service';
 import { TLogin } from '@/types/auth.type';
 
 export default function Page() {
+  const router = useRouter();
   const form = useForm<TLogin>({
     resolver: zodResolver(ZloginSchema),
   });
   const { handleSubmit, control } = form;
-
   const { mutate } = useMutation({
     mutationKey: ['login'],
     mutationFn: async (data: TLogin) => await authService.authLogin(data),
     onError: () => toast.error('Login failed'),
     onSuccess: ({ data }) => {
       toast.success('Login success');
-      Cookies.set('next-office-token', data.token, {
+      Cookies.set('token', data?.token, {
         expires: 1,
       });
+      router.push('/e-surat');
     },
   });
 
