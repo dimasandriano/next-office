@@ -1,4 +1,4 @@
-import { count, ilike } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, lte } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
@@ -17,9 +17,19 @@ export async function GET(request: NextRequest) {
       },
     );
   }
-  const { take, page, search } = useSearchParams(request);
+  const { take, page, search, status, start_date, finish_date } =
+    useSearchParams(request);
   const data = await db.query.surat.findMany({
-    where: ilike(surat.no_surat, '%' + search + '%'),
+    where: and(
+      ilike(surat.no_surat, '%' + search + '%'),
+      status ? eq(surat.status, status) : undefined,
+      start_date && finish_date
+        ? and(
+            gte(surat.tgl_masuk, new Date(start_date)),
+            lte(surat.tgl_masuk, new Date(finish_date)),
+          )
+        : undefined,
+    ),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
     with: {
@@ -32,7 +42,18 @@ export async function GET(request: NextRequest) {
     .select({ value: count(surat.id) })
     .from(surat)
     .limit(Number(take))
-    .where(ilike(surat.no_surat, '%' + search + '%'));
+    .where(
+      and(
+        ilike(surat.no_surat, '%' + search + '%'),
+        status ? eq(surat.status, status) : undefined,
+        start_date && finish_date
+          ? and(
+              gte(surat.tgl_masuk, new Date(start_date)),
+              lte(surat.tgl_masuk, new Date(finish_date)),
+            )
+          : undefined,
+      ),
+    );
   const pagination = useGeneratePagination(request, counts);
   return NextResponse.json({ status: 'success', data, pagination });
 }

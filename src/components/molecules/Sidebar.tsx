@@ -11,7 +11,9 @@ export default function Sidebar() {
         <Button variant='outline' asChild>
           <Link href='/e-surat'>Dashboard</Link>
         </Button>
-        <Button variant='outline'>Home</Button>
+        <Button variant='outline' asChild>
+          <Link href='/e-surat/surat'>Kelola Surat</Link>
+        </Button>
         <Button variant='outline'>Home</Button>
         <Button variant='outline'>Home</Button>
         <Button variant='outline'>Home</Button>
