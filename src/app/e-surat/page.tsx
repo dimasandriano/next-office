@@ -5,7 +5,6 @@ import { DollarSign } from 'lucide-react';
 import React from 'react';
 
 import { Card, CardHeader } from '@/components/ui/card';
-import Typography from '@/components/ui/typography';
 
 import { informationService } from '@/services/information.service';
 
@@ -29,46 +28,46 @@ export default function Page() {
         <Card className='col-span-4'>
           <CardHeader>
             <div className='flex items-center justify-between'>
-              <Typography variant='h3'>Surat Masuk</Typography>
+              <h3 className='text-lg font-semibold'>Surat Masuk</h3>
               <DollarSign />
             </div>
-            <Typography variant='j1'>{data?.surat}</Typography>
+            <h2 className='text-4xl font-bold'>{data?.surat}</h2>
           </CardHeader>
         </Card>
         <Card className='col-span-4'>
           <CardHeader>
             <div className='flex items-center justify-between'>
-              <Typography variant='h3'>Divisi</Typography>
+              <h3 className='text-lg font-semibold'>Divisi</h3>
               <DollarSign />
             </div>
-            <Typography variant='j1'>{data?.divisi}</Typography>
+            <h2 className='text-4xl font-bold'>{data?.divisi}</h2>
           </CardHeader>
         </Card>
         <Card className='col-span-4'>
           <CardHeader>
             <div className='flex items-center justify-between'>
-              <Typography variant='h3'>Kategori</Typography>
+              <h3 className='text-lg font-semibold'>Kategori</h3>
               <DollarSign />
             </div>
-            <Typography variant='j1'>{data?.kategori}</Typography>
+            <h2 className='text-4xl font-bold'>{data?.kategori}</h2>
           </CardHeader>
         </Card>
         <Card className='col-span-4'>
           <CardHeader>
             <div className='flex items-center justify-between'>
-              <Typography variant='h3'>Lamaran</Typography>
+              <h3 className='text-lg font-semibold'>Lamaran</h3>
               <DollarSign />
             </div>
-            <Typography variant='j1'>{data?.lamaran}</Typography>
+            <h2 className='text-4xl font-bold'>{data?.lamaran}</h2>
           </CardHeader>
         </Card>
         <Card className='col-span-4'>
           <CardHeader>
             <div className='flex items-center justify-between'>
-              <Typography variant='h3'>User</Typography>
+              <h3 className='text-lg font-semibold'>User</h3>
               <DollarSign />
             </div>
-            <Typography variant='j1'>{data?.user}</Typography>
+            <h2 className='text-4xl font-bold'>{data?.user}</h2>
           </CardHeader>
         </Card>
       </div>
