@@ -1,4 +1,4 @@
-import { and, count, eq, gte, ilike, lte } from 'drizzle-orm';
+import { and, between, count, eq, ilike } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
@@ -17,39 +17,40 @@ export async function GET(request: NextRequest) {
       },
     );
   }
-  const { take, page, search, status, start_date, finish_date } =
+  const { take, page, search, status, tipe, start_date, finish_date } =
     useSearchParams(request);
   const data = await db.query.surat.findMany({
     where: and(
       ilike(surat.no_surat, '%' + search + '%'),
       status ? eq(surat.status, status) : undefined,
+      tipe ? eq(surat.tipe, tipe) : undefined,
       start_date && finish_date
-        ? and(
-            gte(surat.tgl_masuk, new Date(start_date)),
-            lte(surat.tgl_masuk, new Date(finish_date)),
-          )
+        ? between(surat.tgl_masuk, new Date(start_date), new Date(finish_date))
         : undefined,
     ),
-    limit: Number(take),
-    offset: (Number(page) - 1) * Number(take),
+    limit: take,
+    offset: (page - 1) * take,
     with: {
       kategori: true,
       disposisi: true,
     },
+    orderBy: (surat, { desc }) => [desc(surat.tgl_masuk)],
   });
 
   const counts = await db
     .select({ value: count(surat.id) })
     .from(surat)
-    .limit(Number(take))
+    .limit(take)
     .where(
       and(
         ilike(surat.no_surat, '%' + search + '%'),
         status ? eq(surat.status, status) : undefined,
+        tipe ? eq(surat.tipe, tipe) : undefined,
         start_date && finish_date
-          ? and(
-              gte(surat.tgl_masuk, new Date(start_date)),
-              lte(surat.tgl_masuk, new Date(finish_date)),
+          ? between(
+              surat.tgl_masuk,
+              new Date(start_date),
+              new Date(finish_date),
             )
           : undefined,
       ),

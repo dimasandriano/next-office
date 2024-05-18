@@ -1,1 +1,1 @@
-export type TStatus = 'PROCESS' | 'ON REVIEW' | 'DONE' | 'ARRIVED' | 'ARCHIVED';
+export type TStatus = 'PROCESS' | 'ON_REVIEW' | 'DONE' | 'ARRIVED' | 'ARCHIVED';

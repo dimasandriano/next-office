@@ -28,28 +28,32 @@ import {
 } from '@/components/ui/select';
 
 import { EStatus } from '@/enums/status.enum';
+import { ETipe } from '@/enums/tipe.enum';
 import { suratService } from '@/services/surat.service';
 
 import { TStatus } from '@/types/status.type';
 import { TSchemaSurat } from '@/types/surat.type';
+import { TTipe } from '@/types/tipe.type';
 export default function Page() {
   const [tableContainerRef, { width: widthTableContainer }] = useElementSize();
   const column = useSuratColumn(widthTableContainer || 0);
   const [search, setSearch] = React.useState('');
   const debounceSearch = useDebounce(search, 1000);
   const [status, setStatus] = React.useState<TStatus | 'all'>();
+  const [tipe, setTipe] = React.useState<TTipe | 'all'>();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
   const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['surat', debounceSearch, status, date],
+      queryKey: ['surat', debounceSearch, status, date, tipe],
       queryFn: async ({ pageParam = 1 }) =>
         await suratService.getAllSurat({
           page: pageParam as number,
           search: debounceSearch,
           status: status === 'all' || !status ? undefined : status,
+          tipe: tipe === 'all' || !tipe ? undefined : tipe,
           start_date: date?.from && date.to ? date.from : undefined,
           finish_date: date?.from && date.to ? date.to : undefined,
         }),
@@ -64,28 +68,45 @@ export default function Page() {
     <div className='space-y-3'>
       <h1 className='text-2xl font-semibold'>Kelola Surat</h1>
       <div className='flex items-center justify-between'>
-        <div className='flex w-1/2 items-center justify-between gap-3'>
+        <div className='flex w-2/3 items-center justify-between gap-3'>
           <Input
             placeholder='Cari Surat'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='w-1/3'
+            className='w-1/4'
           />
+          <Select value={tipe} onValueChange={(e) => setTipe(e as TTipe)}>
+            <SelectTrigger className='w-1/4'>
+              <SelectValue placeholder='Filter Tipe' />
+            </SelectTrigger>
+            <SelectContent>
+              {tipe && <SelectItem value='all'>SEMUA</SelectItem>}
+              {ETipe.enumValues.map((tipe) => {
+                if (tipe === 'lamaran') return;
+                return (
+                  <SelectItem value={tipe} key={tipe} className='uppercase'>
+                    {tipe.split('_').join(' ')}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
           <Select value={status} onValueChange={(e) => setStatus(e as TStatus)}>
-            <SelectTrigger className='w-1/3'>
+            <SelectTrigger className='w-1/4'>
               <SelectValue placeholder='Filter Status' />
             </SelectTrigger>
             <SelectContent>
               {status && <SelectItem value='all'>SEMUA</SelectItem>}
               {EStatus.enumValues.map((status) => (
                 <SelectItem value={status} key={status}>
-                  {status}
+                  {status?.split('_').join(' ')}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
           <Popover>
-            <PopoverTrigger asChild className='w-1/3'>
+            <PopoverTrigger asChild className='w-1/4'>
               <Button
                 id='date'
                 variant='outline'
