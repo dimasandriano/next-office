@@ -6,6 +6,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { LoaderCircle } from 'lucide-react';
 import React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -139,7 +140,9 @@ export function TableVirtualized<TData, TValue>({
                 colSpan={columns.length}
                 className='h-24 w-full text-center'
               >
-                Memuat Data...
+                <div className='flex h-full w-full items-center justify-center'>
+                  <LoaderCircle className='h-10 w-10 animate-spin' />
+                </div>
               </TableCell>
             </TableRow>
           ) : data?.length && table.getRowModel().rows?.length ? (

@@ -25,6 +25,7 @@ export const surat = pgTable('surat', {
   peminta: varchar('peminta', { length: 50 }),
   kategori_id: integer('kategori_id'),
   perihal: varchar('perihal', { length: 50 }),
+  ditujukan: varchar('ditujukan', { length: 255 }),
   tgl_kegiatan: timestamp('tgl_kegiatan').notNull(),
   nama_kegiatan: varchar('nama_kegiatan', { length: 100 }),
   tempat: varchar('tempat', { length: 100 }),

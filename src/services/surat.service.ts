@@ -24,4 +24,11 @@ export const suratService = {
     });
     return data;
   },
+
+  getSuratById: async (id: string) => {
+    const { data } = await instance.get(`/surat/${id}`, {
+      headers,
+    });
+    return data.data;
+  },
 };
