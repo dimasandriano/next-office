@@ -1,6 +1,6 @@
 'use client';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -55,7 +55,7 @@ export default function Page() {
           status: status === 'all' || !status ? undefined : status,
           tipe: tipe === 'all' || !tipe ? undefined : tipe,
           start_date: date?.from && date.to ? date.from : undefined,
-          finish_date: date?.from && date.to ? date.to : undefined,
+          finish_date: date?.from && date.to ? addDays(date.to, 1) : undefined,
         }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) => getNextPageParam(lastPage),
