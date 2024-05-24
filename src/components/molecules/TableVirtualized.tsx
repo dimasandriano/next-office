@@ -51,7 +51,7 @@ export function TableVirtualized<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     defaultColumn: {
-      minSize: 0,
+      minSize: 1,
       size: 0,
     },
   });
@@ -65,6 +65,7 @@ export function TableVirtualized<TData, TValue>({
   const tbodyRef = React.useRef<HTMLTableSectionElement>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const headersRef = React.useRef<any[]>([]);
+
   const handleScroll: React.UIEventHandler<HTMLDivElement> = React.useCallback(
     (event) => {
       const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
@@ -169,8 +170,9 @@ export function TableVirtualized<TData, TValue>({
                     <TableCell
                       key={cell.id}
                       style={{
-                        width:
-                          headersRef?.current?.at(cellIndex)?.offsetWidth || 0,
+                        width: table
+                          .getHeaderGroups()[0]
+                          .headers[cellIndex].getSize(),
                       }}
                     >
                       {flexRender(

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { divisi } from '@/lib/drizzle/schema/divisi.schema';
+import { hashid } from '@/lib/hashid';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function DELETE(
@@ -19,8 +20,9 @@ export async function DELETE(
       },
     );
   }
+  const decodeId = hashid.decode(id);
   const cekId = await db.query.divisi.findFirst({
-    where: eq(divisi.id, Number(id)),
+    where: eq(divisi.id, Number(decodeId)),
   });
 
   if (!cekId) {
@@ -33,7 +35,7 @@ export async function DELETE(
   }
   const data = await db
     .delete(divisi)
-    .where(eq(divisi.id, Number(id)))
+    .where(eq(divisi.id, Number(decodeId)))
     .returning();
   return NextResponse.json({ status: 'success', data });
 }

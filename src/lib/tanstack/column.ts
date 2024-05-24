@@ -1,12 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { assign, get } from 'lodash';
-export const COLUMN_SIZE = {
-  NO: 1,
-  CODE: 1,
-  NAME: 2,
-  PRICE: 2,
-  KET: 3,
-};
+
 type Options = {
   minSize?: number;
   maxSize?: number;

@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     where: ilike(divisi.nama, '%' + search + '%'),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
+    orderBy: (divisi, { desc }) => [desc(divisi.created_at)],
   });
 
   const counts = await db

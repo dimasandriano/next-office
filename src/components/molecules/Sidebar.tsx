@@ -41,7 +41,7 @@ export default function Sidebar() {
           </Link>
         </Button>
         <Button variant='outline' asChild isSidebar>
-          <Link href='/e-surat/surat' className='flex items-center gap-3'>
+          <Link href='/e-surat/divisi' className='flex items-center gap-3'>
             <Split />
             Kelola Divisi
           </Link>

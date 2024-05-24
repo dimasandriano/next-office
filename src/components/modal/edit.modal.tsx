@@ -30,31 +30,40 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
+import { divisiService } from '@/services/divisi.service';
 import { kategoriService } from '@/services/kategori.service';
 
+import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 
 interface TEditModal {
   kategori?: TSchemaKategori;
+  divisi?: TSchemaDivisi;
 }
 
 /**
  * @example
  * <EditModal surat={row.original} />
  */
-export function EditModal({ kategori }: TEditModal) {
-  const form = useForm<TSchemaKategori>({
+export function EditModal({ kategori, divisi }: TEditModal) {
+  const form = useForm<TSchemaKategori | TSchemaDivisi>({
     mode: 'all',
   });
 
   React.useEffect(() => {
     form.reset(kategori);
+    form.reset(divisi);
     if (kategori) {
       form.setValue('id', kategori.id);
       form.setValue('nama', kategori.nama);
       form.setValue('keterangan', kategori.keterangan);
     }
-  }, [form, kategori]);
+    if (divisi) {
+      form.setValue('id', divisi.id);
+      form.setValue('nama', divisi.nama);
+      form.setValue('keterangan', divisi.keterangan);
+    }
+  }, [divisi, form, kategori]);
 
   const { mutate: updateKategori } = useMutation({
     mutationKey: ['update-surat'],
@@ -68,6 +77,18 @@ export function EditModal({ kategori }: TEditModal) {
       toast.error('Edit Kategori Gagal');
     },
   });
+  const { mutate: updateDivisi } = useMutation({
+    mutationKey: ['update-divisi'],
+    mutationFn: (data: Partial<TSchemaDivisi>) =>
+      divisiService.updateDivisi(data),
+    onSuccess: () => {
+      toast.success('Edit Divisi Berhasil');
+      queryClient.invalidateQueries({ queryKey: ['divisi'] });
+    },
+    onError: () => {
+      toast.error('Edit Divisi Gagal');
+    },
+  });
 
   const handleUpdate = React.useCallback(
     (data: TSchemaKategori) => {
@@ -79,8 +100,16 @@ export function EditModal({ kategori }: TEditModal) {
         });
         return;
       }
+      if (divisi) {
+        updateDivisi({
+          id: divisi.id,
+          nama: data.nama,
+          keterangan: data.keterangan,
+        });
+        return;
+      }
     },
-    [kategori, updateKategori],
+    [divisi, kategori, updateDivisi, updateKategori],
   );
   return (
     <Dialog>
@@ -91,7 +120,9 @@ export function EditModal({ kategori }: TEditModal) {
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Edit {kategori && 'Kategori'}</DialogTitle>
+          <DialogTitle>
+            Edit {kategori && 'Kategori'} {divisi && 'Divisi'}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -103,10 +134,14 @@ export function EditModal({ kategori }: TEditModal) {
               name='nama'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Kategori</FormLabel>
+                  <FormLabel>
+                    Nama {kategori ? 'Kategori' : ''} {divisi ? 'Divisi' : ''}
+                  </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Masukkan Nama Kategori'
+                      placeholder={`Masukkan Nama ${kategori ? 'Kategori' : ''}${
+                        divisi ? 'Divisi' : ''
+                      }`}
                       {...(field as any)}
                     />
                   </FormControl>
@@ -119,10 +154,15 @@ export function EditModal({ kategori }: TEditModal) {
               name='keterangan'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Keterangan Kategori</FormLabel>
+                  <FormLabel>
+                    Keterangan {kategori ? 'Kategori' : ''}{' '}
+                    {divisi ? 'Divisi' : ''}
+                  </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder='Masukkan Keterangan Kategori'
+                      placeholder={`Masukkan Keterangan ${kategori ? 'Kategori' : ''}${
+                        divisi ? 'Divisi' : ''
+                      }`}
                       {...(field as any)}
                     />
                   </FormControl>
