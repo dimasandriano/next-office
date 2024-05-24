@@ -22,9 +22,7 @@ export async function GET(request: NextRequest) {
     where: ilike(kategori.nama, '%' + search + '%'),
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
-    with: {
-      surat: true,
-    },
+    orderBy: (kategori, { desc }) => [desc(kategori.created_at)],
   });
 
   const counts = await db

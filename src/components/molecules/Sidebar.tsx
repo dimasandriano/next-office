@@ -1,3 +1,11 @@
+import {
+  LayoutDashboard,
+  Mail,
+  ScrollText,
+  Split,
+  SquareStack,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
@@ -8,15 +16,42 @@ export default function Sidebar() {
     <div className='h-screen w-full space-y-5 p-3'>
       <div className='pb-2 text-center'>LOGO</div>
       <div className='flex flex-col justify-start gap-5'>
-        <Button variant='outline' asChild>
-          <Link href='/e-surat'>Dashboard</Link>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat' className='flex items-center gap-3'>
+            <LayoutDashboard />
+            Dashboard
+          </Link>
         </Button>
-        <Button variant='outline' asChild>
-          <Link href='/e-surat/surat'>Kelola Surat</Link>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat/surat' className='flex items-center gap-3'>
+            <Mail />
+            Kelola Surat
+          </Link>
         </Button>
-        <Button variant='outline'>Home</Button>
-        <Button variant='outline'>Home</Button>
-        <Button variant='outline'>Home</Button>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat/surat' className='flex items-center gap-3'>
+            <ScrollText />
+            Kelola Lamaran
+          </Link>
+        </Button>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat/kategori' className='flex items-center gap-3'>
+            <SquareStack />
+            Kelola Kategori
+          </Link>
+        </Button>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat/surat' className='flex items-center gap-3'>
+            <Split />
+            Kelola Divisi
+          </Link>
+        </Button>
+        <Button variant='outline' asChild isSidebar>
+          <Link href='/e-surat/surat' className='flex items-center gap-3'>
+            <Users />
+            Kelola Pengguna
+          </Link>
+        </Button>
       </div>
     </div>
   );

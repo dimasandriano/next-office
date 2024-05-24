@@ -20,19 +20,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+import { kategoriService } from '@/services/kategori.service';
 import { suratService } from '@/services/surat.service';
 
+import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaSurat } from '@/types/surat.type';
 
 interface TDeleteModal {
   surat?: TSchemaSurat;
+  kategori?: TSchemaKategori;
 }
 
 /**
  * @example
  * <DeleteModal surat={row.original} />
  */
-export function DeleteModal({ surat }: TDeleteModal) {
+export function DeleteModal({ surat, kategori }: TDeleteModal) {
   const { mutate: deleteSurat } = useMutation({
     mutationKey: ['delete-surat'],
     mutationFn: (id: string) => suratService.deleteSurat(id),
@@ -44,14 +47,29 @@ export function DeleteModal({ surat }: TDeleteModal) {
       toast.error('Hapus Surat Gagal');
     },
   });
+  const { mutate: deleteKategori } = useMutation({
+    mutationKey: ['delete-kategori'],
+    mutationFn: (id: string) => kategoriService.deleteKategori(id),
+    onSuccess: () => {
+      toast.success('Hapus Kategori Berhasil');
+      queryClient.invalidateQueries({ queryKey: ['kategori'] });
+    },
+    onError: () => {
+      toast.error('Hapus Kategori Gagal');
+    },
+  });
   const handleDelete = useCallback(
     (id: string) => {
       if (surat) {
         deleteSurat(id);
         return;
       }
+      if (kategori) {
+        deleteKategori(id);
+        return;
+      }
     },
-    [deleteSurat, surat],
+    [deleteKategori, deleteSurat, kategori, surat],
   );
   return (
     <Dialog>
@@ -62,11 +80,15 @@ export function DeleteModal({ surat }: TDeleteModal) {
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Hapus {surat && 'Surat'}</DialogTitle>
+          <DialogTitle>
+            Hapus {surat && 'Surat'} {kategori && 'Kategori'}
+          </DialogTitle>
           <DialogDescription>
-            Apakah anda yakin ingin menghapus {surat && 'surat'} ini? <br />
+            Apakah anda yakin ingin menghapus {surat && 'surat'}{' '}
+            {kategori && 'kategori'} ini? <br />
             <span className='block text-center text-lg font-semibold text-red-400'>
               {surat && surat.no_surat}
+              {kategori && kategori.nama}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -76,7 +98,14 @@ export function DeleteModal({ surat }: TDeleteModal) {
               type='button'
               variant='destructive'
               className='flex-1'
-              onClick={() => handleDelete(hashid.encode(surat?.id as number))}
+              onClick={() => {
+                if (surat) {
+                  handleDelete(hashid.encode(surat?.id as number));
+                }
+                if (kategori) {
+                  handleDelete(hashid.encode(kategori?.id as number));
+                }
+              }}
             >
               Hapus
             </Button>

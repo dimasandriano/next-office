@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { kategori } from '@/lib/drizzle/schema/kategori.schema';
+import { hashid } from '@/lib/hashid';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function DELETE(
@@ -19,8 +20,9 @@ export async function DELETE(
       },
     );
   }
+  const decodeId = hashid.decode(id);
   const cekId = await db.query.kategori.findFirst({
-    where: eq(kategori.id, Number(id)),
+    where: eq(kategori.id, Number(decodeId)),
   });
 
   if (!cekId) {
@@ -33,7 +35,7 @@ export async function DELETE(
   }
   const data = await db
     .delete(kategori)
-    .where(eq(kategori.id, Number(id)))
+    .where(eq(kategori.id, Number(decodeId)))
     .returning();
   return NextResponse.json({ status: 'success', data });
 }
