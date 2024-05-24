@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
+import { hashid } from '@/lib/hashid';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function DELETE(
@@ -19,8 +20,10 @@ export async function DELETE(
       },
     );
   }
+
+  const decodeId = hashid.decode(id);
   const cekId = await db.query.surat.findFirst({
-    where: eq(surat.id, Number(id)),
+    where: eq(surat.id, Number(decodeId)),
   });
 
   if (!cekId) {
@@ -33,7 +36,7 @@ export async function DELETE(
   }
   const data = await db
     .delete(surat)
-    .where(eq(surat.id, Number(id)))
+    .where(eq(surat.id, Number(decodeId)))
     .returning();
   return NextResponse.json({ status: 'success', data });
 }

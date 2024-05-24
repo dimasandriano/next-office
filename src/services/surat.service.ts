@@ -39,4 +39,11 @@ export const suratService = {
     });
     return response;
   },
+
+  deleteSurat: async (id: string) => {
+    const { data } = await instance.delete(`/surat/delete/${id}`, {
+      headers,
+    });
+    return data;
+  },
 };

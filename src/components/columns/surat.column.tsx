@@ -1,13 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
-import { Eye, PenBox, TrashIcon } from 'lucide-react';
+import { Eye, PenBox } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
 import { hashid } from '@/lib/hashid';
 import { generateSize } from '@/lib/tanstack/column';
 
+import { DeleteModal } from '@/components/modal/delete.modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -108,18 +109,20 @@ export default function useSuratColumn(widthTableContainer: number) {
         },
         cell: ({ row }) => {
           return (
-            <div className='flex gap-2'>
-              <Button size='icon' variant='outline' asChild>
-                <Link href={'/e-surat/surat/' + hashid.encode(row.original.id)}>
-                  <Eye />
-                </Link>
-              </Button>
-              <Button size='icon' variant='default'>
-                <PenBox />
-              </Button>
-              <Button size='icon' variant='destructive'>
-                <TrashIcon />
-              </Button>
+            <div>
+              <div className='flex gap-2'>
+                <Button size='icon' variant='outline' asChild>
+                  <Link
+                    href={'/e-surat/surat/' + hashid.encode(row.original.id)}
+                  >
+                    <Eye />
+                  </Link>
+                </Button>
+                <Button size='icon' variant='default'>
+                  <PenBox />
+                </Button>
+                <DeleteModal surat={row.original} />
+              </div>
             </div>
           );
         },
