@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaSurat } from '@/types/surat.type';
@@ -16,14 +17,7 @@ const createSchema = createInsertSchema(surat, {
 });
 export async function POST(request: NextRequest) {
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const body: TSchemaSurat = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {

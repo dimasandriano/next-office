@@ -3,20 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { kategori } from '@/lib/drizzle/schema/kategori.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaKategori } from '@/types/kategori.type';
 const createSchema = createInsertSchema(kategori, {});
 export async function POST(request: NextRequest) {
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const body = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {

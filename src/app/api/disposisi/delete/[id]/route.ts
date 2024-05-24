@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function DELETE(
@@ -11,14 +12,7 @@ export async function DELETE(
 ) {
   const { id } = params;
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const cekId = await db.query.disposisi.findFirst({
     where: eq(disposisi.id, Number(id)),
   });

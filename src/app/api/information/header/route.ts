@@ -7,18 +7,12 @@ import { kategori } from '@/lib/drizzle/schema/kategori.schema';
 import { lamaran } from '@/lib/drizzle/schema/lamaran.schema';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
 import { users } from '@/lib/drizzle/schema/users.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 export async function GET(request: NextRequest) {
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const countSurat = await db.select({ value: count(surat.id) }).from(surat);
   const countKategori = await db
     .select({ value: count(kategori.id) })

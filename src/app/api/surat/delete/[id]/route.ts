@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import { hashid } from '@/lib/hashid';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
@@ -12,14 +13,7 @@ export async function DELETE(
 ) {
   const { id } = params;
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
 
   const decodeId = hashid.decode(id);
   const cekId = await db.query.surat.findFirst({

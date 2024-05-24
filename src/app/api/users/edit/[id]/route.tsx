@@ -17,22 +17,16 @@ const editSchema = createInsertSchema(users, {
 });
 import bcrypt from 'bcryptjs';
 
-import { TSchemaUsers } from '@/types/users.type';
+import { UnauthorizedError } from '@/lib/exceptions';
 
+import { TSchemaUsers } from '@/types/users.type';
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const { id } = params;
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const body: TSchemaUsers = await request.json();
   const result = editSchema.safeParse(body);
   if (!result.success) {

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
@@ -14,14 +15,7 @@ const createSchema = createInsertSchema(disposisi, {
 
 export async function POST(request: NextRequest) {
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const body: TSchemaDisposisi = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {

@@ -6,6 +6,8 @@ import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
+import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaUsers } from '@/types/users.type';
 
@@ -18,6 +20,8 @@ const registerSchema = createInsertSchema(users, {
 });
 
 export async function POST(request: NextRequest) {
+  const verify = useVerifyJwt(request);
+  if (!verify) return UnauthorizedError();
   const body: TSchemaUsers = await request.json();
   const result = registerSchema.safeParse(body);
   const { full_name, username, password, role } = body;

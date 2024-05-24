@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
 import { divisi } from '@/lib/drizzle/schema/divisi.schema';
+import { UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaDivisi } from '@/types/divisi.type';
@@ -14,14 +15,7 @@ export async function PUT(
 ) {
   const { id } = params;
   const verify = useVerifyJwt(request);
-  if (!verify) {
-    return NextResponse.json(
-      { status: 'error', error: 'Unauthorized' },
-      {
-        status: 401,
-      },
-    );
-  }
+  if (!verify) return UnauthorizedError();
   const cekId = await db.query.divisi.findFirst({
     where: eq(divisi.id, Number(id)),
   });

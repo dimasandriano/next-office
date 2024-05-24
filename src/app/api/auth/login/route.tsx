@@ -35,6 +35,8 @@ export async function POST(request: Request) {
       id: users.id,
       username: users.username,
       password: users.password,
+      role: users.role,
+      divisi_id: users.divisi_id,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -65,6 +67,8 @@ export async function POST(request: Request) {
     {
       id: user[0].id,
       username: user[0].username,
+      role: user[0].role,
+      divisi_id: user[0].divisi_id,
     },
     (process.env.JWT_SECRET as string) || 'secret',
     {
