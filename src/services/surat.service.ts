@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import instance from '@/lib/axios/instance';
 
 import { TParams } from '@/types/params.type';
+import { TSchemaSurat } from '@/types/surat.type';
 
 type TParamsSurat = TParams & {
   status?: string;
@@ -30,5 +31,12 @@ export const suratService = {
       headers,
     });
     return data.data;
+  },
+
+  createSurat: async (data: TSchemaSurat) => {
+    const { data: response } = await instance.post('/surat/create', data, {
+      headers,
+    });
+    return response;
   },
 };

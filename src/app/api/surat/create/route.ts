@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     tgl_kegiatan,
     tgl_masuk,
     tipe,
+    ditujukan,
   } = body;
   const data = await db
     .insert(surat)
@@ -81,6 +82,7 @@ export async function POST(request: NextRequest) {
       tgl_kegiatan: new Date(tgl_kegiatan),
       tgl_masuk: new Date(tgl_masuk),
       tipe,
+      ditujukan,
     })
     .returning();
   return NextResponse.json({ status: 'success', data });

@@ -2,6 +2,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
+import Link from 'next/link';
 import React, { useMemo } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useDebounce, useElementSize } from 'usehooks-ts';
@@ -142,7 +143,9 @@ export default function Page() {
             </PopoverContent>
           </Popover>
         </div>
-        <Button variant='default'>Tambah Surat</Button>
+        <Button variant='default' asChild>
+          <Link href='/e-surat/surat/create'>Tambah Surat</Link>
+        </Button>
       </div>
       <div ref={tableContainerRef}>
         <TableVirtualized
