@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 import instance from '@/lib/axios/instance';
 
 import { TParams } from '@/types/params.type';
@@ -12,38 +10,26 @@ type TParamsSurat = TParams & {
   finish_date?: string | Date;
 };
 
-const token = Cookies.get('token');
-const headers = {
-  Authorization: 'Bearer ' + token,
-};
-
 export const suratService = {
   getAllSurat: async (params: TParamsSurat) => {
     const { data } = await instance.get('/surat/list', {
       params,
-      headers,
     });
     return data;
   },
 
   getSuratById: async (id: string) => {
-    const { data } = await instance.get(`/surat/${id}`, {
-      headers,
-    });
+    const { data } = await instance.get(`/surat/${id}`);
     return data.data;
   },
 
   createSurat: async (data: TSchemaSurat) => {
-    const { data: response } = await instance.post('/surat/create', data, {
-      headers,
-    });
+    const { data: response } = await instance.post('/surat/create', data);
     return response;
   },
 
   deleteSurat: async (id: string) => {
-    const { data } = await instance.delete(`/surat/delete/${id}`, {
-      headers,
-    });
+    const { data } = await instance.delete(`/surat/delete/${id}`);
     return data;
   },
 };

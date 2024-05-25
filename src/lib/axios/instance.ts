@@ -1,21 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const token = Cookies.get('token');
-
-const headers = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json',
-  'Cache-Control': 'no-cache',
-  Authorization: 'Bearer ' + token,
-};
-
 const instance = axios.create({
   baseURL: '/api',
-  headers,
 });
 
 instance.interceptors.request.use((config) => {
+  const token = Cookies.get('token');
+  config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
