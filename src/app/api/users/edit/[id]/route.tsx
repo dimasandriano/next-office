@@ -17,7 +17,7 @@ const editSchema = createInsertSchema(users, {
 });
 import bcrypt from 'bcryptjs';
 
-import { UnauthorizedError } from '@/lib/exceptions';
+import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 
 import { TSchemaUsers } from '@/types/users.type';
 export async function PUT(
@@ -29,16 +29,8 @@ export async function PUT(
   if (!verify) return UnauthorizedError();
   const body: TSchemaUsers = await request.json();
   const result = editSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
-  const { full_name, username, password, role, is_active } = body;
+  if (!result.success) return BadRequestError(result.error);
+  const { full_name, username, password, role, is_active, divisi_id } = body;
 
   const userID = await db.query.users.findFirst({
     where: eq(users.id, Number(id)),
@@ -48,29 +40,30 @@ export async function PUT(
     const checkUsername = await db.query.users.findFirst({
       where: eq(users.username, username),
     });
-    if (checkUsername) {
-      return NextResponse.json(
-        {
-          status: 'error',
-          error: 'Username already exists',
-        },
-        { status: 400 },
-      );
-    }
+    if (checkUsername) return BadRequestError('Username already exists');
   }
 
   if (password) {
     const hashedPassword = bcrypt.hashSync(password, 10);
     const data = await db
       .update(users)
-      .set({ full_name, username, password: hashedPassword, role, is_active })
-      .where(eq(users.id, Number(id)));
+      .set({
+        full_name,
+        username,
+        password: hashedPassword,
+        role,
+        is_active,
+        divisi_id,
+      })
+      .where(eq(users.id, Number(id)))
+      .returning();
     return NextResponse.json({ status: 'success', data });
   }
 
   const data = await db
     .update(users)
-    .set({ full_name, username, role, is_active })
-    .where(eq(users.id, Number(id)));
+    .set({ full_name, username, role, is_active, divisi_id })
+    .where(eq(users.id, Number(id)))
+    .returning();
   return NextResponse.json({ status: 'success', data });
 }

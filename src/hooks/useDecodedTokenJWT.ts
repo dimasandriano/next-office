@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Cookies from 'js-cookie';
 import jwt from 'jsonwebtoken';
+import { NextRequest } from 'next/server';
 
 import { TSchemaUsers } from '@/types/users.type';
 
-export default function useDecodedTokenJWT() {
-  const token = Cookies.get('token') || ' ';
-  try {
-    const decoded = jwt.decode(token) as TSchemaUsers;
-    return {
-      id: decoded?.id,
-      role: decoded?.role,
-      username: decoded?.username,
-      divisi_id: decoded?.divisi_id,
-    };
-  } catch {
-    return null;
-  }
+export default function useDecodedTokenJWT(request: NextRequest) {
+  const token = request
+    ? request.cookies.get('token')?.value
+    : Cookies.get('token') || ' ';
+
+  const decoded = jwt.decode(token as any) as TSchemaUsers;
+  return {
+    id: decoded?.id,
+    role: decoded?.role,
+    username: decoded?.username,
+    divisi_id: decoded?.divisi_id,
+  };
 }

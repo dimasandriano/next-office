@@ -1,15 +1,13 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
-import { Eye, PenBox } from 'lucide-react';
-import Link from 'next/link';
 import React from 'react';
 
-import { hashid } from '@/lib/hashid';
 import { generateSize } from '@/lib/tanstack/column';
 
+import { DeleteModal } from '@/components/modal/delete.modal';
+import { EditModalUser } from '@/components/modal/edituser.modal';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 import { TSchemaUsers } from '@/types/users.type';
 
@@ -114,16 +112,8 @@ export default function useUserColumn(widthTableContainer: number) {
           return (
             <div>
               <div className='flex gap-2'>
-                <Button size='icon' variant='outline' asChild>
-                  <Link
-                    href={'/e-surat/surat/' + hashid.encode(row.original.id)}
-                  >
-                    <Eye />
-                  </Link>
-                </Button>
-                <Button size='icon' variant='default'>
-                  <PenBox />
-                </Button>
+                <EditModalUser users={row.original} />
+                <DeleteModal users={row.original} />
               </div>
             </div>
           );

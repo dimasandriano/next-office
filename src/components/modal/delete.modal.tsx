@@ -23,22 +23,25 @@ import {
 import { divisiService } from '@/services/divisi.service';
 import { kategoriService } from '@/services/kategori.service';
 import { suratService } from '@/services/surat.service';
+import { userService } from '@/services/user.service';
 
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaSurat } from '@/types/surat.type';
+import { TSchemaUsers } from '@/types/users.type';
 
 interface TDeleteModal {
   surat?: TSchemaSurat;
   kategori?: TSchemaKategori;
   divisi?: TSchemaDivisi;
+  users?: TSchemaUsers;
 }
 
 /**
  * @example
  * <DeleteModal surat={row.original} />
  */
-export function DeleteModal({ surat, kategori, divisi }: TDeleteModal) {
+export function DeleteModal({ surat, kategori, divisi, users }: TDeleteModal) {
   const { mutate: deleteSurat } = useMutation({
     mutationKey: ['delete-surat'],
     mutationFn: (id: string) => suratService.deleteSurat(id),
@@ -72,6 +75,17 @@ export function DeleteModal({ surat, kategori, divisi }: TDeleteModal) {
       toast.error('Hapus Divisi Gagal');
     },
   });
+  const { mutate: deleteUser } = useMutation({
+    mutationKey: ['delete-user'],
+    mutationFn: (id: string) => userService.deleteUser(id),
+    onSuccess: () => {
+      toast.success('Hapus Pengguna Berhasil');
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+    onError: () => {
+      toast.error('Hapus Pengguna Gagal');
+    },
+  });
   const handleDelete = useCallback(
     (id: string) => {
       if (surat) {
@@ -86,8 +100,21 @@ export function DeleteModal({ surat, kategori, divisi }: TDeleteModal) {
         deleteDivisi(id);
         return;
       }
+      if (users) {
+        deleteUser(id);
+        return;
+      }
     },
-    [deleteDivisi, deleteKategori, deleteSurat, divisi, kategori, surat],
+    [
+      deleteDivisi,
+      deleteKategori,
+      deleteSurat,
+      deleteUser,
+      divisi,
+      kategori,
+      surat,
+      users,
+    ],
   );
   return (
     <Dialog>
@@ -99,15 +126,18 @@ export function DeleteModal({ surat, kategori, divisi }: TDeleteModal) {
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>
-            Hapus {surat && 'Surat'} {kategori && 'Kategori'}
+            Hapus {surat && 'Surat'} {kategori && 'Kategori'}{' '}
+            {divisi && 'Divisi'} {users && 'Pengguna'}
           </DialogTitle>
           <DialogDescription>
             Apakah anda yakin ingin menghapus {surat && 'surat'}{' '}
-            {kategori && 'kategori'} {divisi && 'divisi'} ini? <br />
+            {kategori && 'kategori'} {divisi && 'divisi'} {users && 'pengguna'}{' '}
+            ini? <br />
             <span className='block text-center text-lg font-semibold text-red-400'>
               {surat && surat.no_surat}
               {kategori && kategori.nama}
               {divisi && divisi.nama}
+              {users && users.username}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -126,6 +156,9 @@ export function DeleteModal({ surat, kategori, divisi }: TDeleteModal) {
                 }
                 if (divisi) {
                   handleDelete(hashid.encode(divisi?.id as number));
+                }
+                if (users) {
+                  handleDelete(hashid.encode(users?.id as number));
                 }
               }}
             >

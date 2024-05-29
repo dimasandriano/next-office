@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -29,8 +29,15 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
+import { ERole } from '@/enums/role.enum';
 import { divisiService } from '@/services/divisi.service';
 import { userService } from '@/services/user.service';
 
@@ -63,21 +70,34 @@ export default function Page() {
     return data?.pages.flatMap((page) => page.data || []) || [];
   }, [data]);
 
-  const form = useForm<TSchemaDivisi>({
+  const form = useForm<TSchemaUsers>({
     mode: 'all',
   });
-  const { mutate: mutateCreateDivisi } = useMutation({
-    mutationKey: ['create-divisi'],
-    mutationFn: (data: TSchemaDivisi) => divisiService.createDivisi(data),
+  const { mutate: mutateCreateUser } = useMutation({
+    mutationKey: ['create-user'],
+    mutationFn: (data: TSchemaUsers) => userService.createUser(data),
     onSuccess: () => {
-      toast.success('Divisi Berhasil Bertambah');
+      toast.success('Pengguna Berhasil Bertambah');
       refetch();
     },
     onError: () => {
-      toast.error('Divisi Gagal Bertambah');
+      toast.error('Pengguna Gagal Bertambah');
     },
   });
-
+  const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
+    queryKey: ['divisi'],
+    queryFn: () => divisiService.getAllDivisiSelection(),
+  });
+  const onSubmit = React.useCallback(
+    (data: any) => {
+      mutateCreateUser({
+        ...data,
+        is_active: data.is_active === 'true' ? true : false,
+        divisi_id: Number(data.divisi_id),
+      });
+    },
+    [mutateCreateUser],
+  );
   const column = useUserColumn(widthTableContainer || 0);
   return (
     <div>
@@ -113,25 +133,50 @@ export default function Page() {
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
         <DialogContent className='max-w-lg'>
           <DialogHeader>
-            <DialogTitle>Tambah Divisi</DialogTitle>
+            <DialogTitle>Tambah User</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(() =>
-                mutateCreateDivisi(form.getValues()),
-              )}
+              onSubmit={form.handleSubmit(() => onSubmit(form.getValues()))}
               className='space-y-3'
             >
               <FormField
                 control={form.control}
-                name='nama'
+                name='full_name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama Divisi</FormLabel>
+                    <FormLabel>Nama Pengguna</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Masukkan Nama' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='username'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Masukkan Username' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Masukkan Nama Divisi'
-                        {...(field as any)}
+                        type='password'
+                        placeholder='Masukkan Password'
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -140,16 +185,82 @@ export default function Page() {
               />
               <FormField
                 control={form.control}
-                name='keterangan'
+                name='role'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Keterangan Divisi</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder='Masukkan Keterangan Divisi'
-                        {...(field as any)}
-                      />
-                    </FormControl>
+                    <FormLabel>Role</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Pilih Role' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {ERole.enumValues.map((item, index) => {
+                          return (
+                            <SelectItem value={item} key={index}>
+                              {item}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='is_active'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value as any}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Pilih Status' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='true'>Aktif</SelectItem>
+                        <SelectItem value='false'>Tidak Aktif</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='divisi_id'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Divisi</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Pilih Divisi' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {dataDivisi?.map((divisi, index) => {
+                          return (
+                            <SelectItem
+                              value={divisi.id?.toString()}
+                              key={index}
+                            >
+                              {divisi.nama}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

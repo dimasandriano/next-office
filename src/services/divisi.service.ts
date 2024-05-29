@@ -10,6 +10,11 @@ export const divisiService = {
     return data;
   },
 
+  getAllDivisiSelection: async () => {
+    const { data } = await instance.get('/divisi/list');
+    return data.data;
+  },
+
   createDivisi: async (data: TSchemaDivisi) => {
     const { data: result } = await instance.post('/divisi/create', data);
     return result.data;
