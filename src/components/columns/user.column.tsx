@@ -25,16 +25,6 @@ export default function useUserColumn(widthTableContainer: number) {
         },
       },
       {
-        id: 'username',
-        header: 'Username',
-        meta: {
-          sizeScale: 4,
-        },
-        cell: ({ row }) => {
-          return row.original.username;
-        },
-      },
-      {
         id: 'full_name',
         header: 'Nama Pengguna',
         meta: {
@@ -42,6 +32,16 @@ export default function useUserColumn(widthTableContainer: number) {
         },
         cell: ({ row }) => {
           return row.original.full_name;
+        },
+      },
+      {
+        id: 'username',
+        header: 'Username',
+        meta: {
+          sizeScale: 4,
+        },
+        cell: ({ row }) => {
+          return row.original.username;
         },
       },
       {

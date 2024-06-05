@@ -31,7 +31,7 @@ export default function Sidebar() {
             </Link>
           </Button>
           <Button variant='outline' asChild isSidebar>
-            <Link href='/e-surat/surat' className='flex items-center gap-3'>
+            <Link href='/e-surat/lamaran' className='flex items-center gap-3'>
               <ScrollText />
               Kelola Lamaran
             </Link>

@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
+import { BadRequestError, NotFoundError } from '@/lib/exceptions';
 
 const loginSchema = z.object({
   username: z
@@ -19,15 +20,7 @@ const loginSchema = z.object({
 export async function POST(request: Request) {
   const body = await request.json();
   const result = loginSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success) return BadRequestError(result.error);
   const { username, password } = result.data;
 
   const user = await db
@@ -36,33 +29,20 @@ export async function POST(request: Request) {
       username: users.username,
       password: users.password,
       role: users.role,
+      is_active: users.is_active,
       divisi_id: users.divisi_id,
     })
     .from(users)
     .where(eq(users.username, username))
     .limit(1);
 
-  if (!user.length) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: 'Username not found',
-      },
-      { status: 400 },
-    );
-  }
+  if (!user.length) return NotFoundError('Username not found');
+
+  if (!user[0].is_active) return BadRequestError('User not active');
 
   const checkPassword = bcrypt.compareSync(password, user[0].password);
+  if (!checkPassword) return BadRequestError('Wrong password');
 
-  if (!checkPassword) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: 'Wrong password',
-      },
-      { status: 400 },
-    );
-  }
   const token = jwt.sign(
     {
       id: user[0].id,
