@@ -1,10 +1,14 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import _ from 'lodash';
 import { CalendarIcon, Plus } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm, UseFormReset } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
+import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
 import FileUploaderMultiple from '@/components/molecules/UploadMultiple';
@@ -39,9 +43,7 @@ import {
 } from '@/components/ui/select';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -52,8 +54,13 @@ import {
   Stepper,
   useStepper,
 } from '@/components/ui/stepper';
+import { Textarea } from '@/components/ui/textarea';
 
 import { EJenjang } from '@/enums/jenjang.enum';
+import { EStatus } from '@/enums/status.enum';
+import { lamaranService } from '@/services/lamaran.service';
+
+import { TSchemaLamaran } from '@/types/lamaran.type';
 
 export default function LamaranSheet() {
   const steps = [
@@ -63,15 +70,60 @@ export default function LamaranSheet() {
     { label: 'Dokumen' },
   ] satisfies StepItem[];
   const form = useForm({
-    mode: 'all',
+    mode: 'onChange',
   });
-  const { handleSubmit, resetField } = form;
+  const { handleSubmit, resetField, reset, getValues } = form;
+  const [pathFiles, setPathFiles] = useState<string[]>([]);
   const [educations, setEducations] = useState<number[]>([1]);
+
+  const { mutate: mutateCreateLamaran, isPending } = useMutation({
+    mutationKey: ['createlamaran'],
+    mutationFn: (data: Partial<TSchemaLamaran>) =>
+      lamaranService.createLamaran(data),
+    onSuccess: () => {
+      toast.success('Lamaran Berhasil Dibuat');
+      reset();
+      setPathFiles([]);
+      queryClient.invalidateQueries({ queryKey: ['lamaran'] });
+    },
+    onError: () => toast.error('Lamaran Gagal Dibuat'),
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = useCallback((data: any) => {
+  const onSubmit = useCallback(() => {
     // eslint-disable-next-line no-console
-    console.log(data);
-  }, []);
+    console.log(getValues());
+    // grouping pendidikan
+    const grouped = _.groupBy(Object.entries(getValues()), ([key, _value]) =>
+      key ? key.match(/[a-zA-Z]+/)?.[0] : null,
+    );
+    const combinedPendidikan = _.zipWith(
+      grouped.ipk,
+      grouped.gelar,
+      grouped.jenjang,
+      grouped.prodi,
+      grouped.tgllulus,
+      (
+        [_ipkKey, ipkValue],
+        [_gelarKey, gelarValue],
+        [_jenjangKey, jenjangValue],
+        [_prodiKey, prodiValue],
+        [_tgllulusKey, tgllulusValue],
+      ) => ({
+        ipk: ipkValue,
+        gelar: gelarValue,
+        jenjang: jenjangValue,
+        prodi: prodiValue,
+        tgllulus: tgllulusValue,
+      }),
+    );
+    mutateCreateLamaran({
+      pendidikan: JSON.stringify(combinedPendidikan),
+      files: JSON.stringify(pathFiles),
+      tgl_dikirim: getValues().tgl_dikirim as Date,
+      ...getValues(),
+    });
+  }, [getValues, mutateCreateLamaran, pathFiles]);
 
   return (
     <Sheet>
@@ -93,7 +145,7 @@ export default function LamaranSheet() {
               <div className='flex w-full flex-col gap-4'>
                 <Stepper initialStep={0} steps={steps}>
                   <Step label={steps[0].label}>
-                    <div className='my-4 w-1/2 space-y-3'>
+                    <div className='my-4 space-y-3'>
                       <FormField
                         control={form.control}
                         name='tgl'
@@ -208,10 +260,12 @@ export default function LamaranSheet() {
                                     name={'universitas' + education}
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>Universitas</FormLabel>
+                                        <FormLabel>
+                                          Universitas / Sekolah
+                                        </FormLabel>
                                         <FormControl>
                                           <Input
-                                            placeholder='Masukkan Universitas'
+                                            placeholder='Masukkan Universitas / Sekolah'
                                             {...field}
                                           />
                                         </FormControl>
@@ -224,10 +278,10 @@ export default function LamaranSheet() {
                                     name={'prodi' + education}
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>Prodi</FormLabel>
+                                        <FormLabel>Prodi / Jurusan</FormLabel>
                                         <FormControl>
                                           <Input
-                                            placeholder='Masukkan Prodi'
+                                            placeholder='Masukkan Prodi / Jurusan'
                                             {...field}
                                           />
                                         </FormControl>
@@ -261,7 +315,7 @@ export default function LamaranSheet() {
                                         </FormLabel>
                                         <Select
                                           onValueChange={field.onChange}
-                                          defaultValue={field.value}
+                                          value={field.value || ''}
                                         >
                                           <FormControl>
                                             <SelectTrigger>
@@ -309,7 +363,7 @@ export default function LamaranSheet() {
                                   />
                                   <FormField
                                     control={form.control}
-                                    name={'tgl_lulus' + education}
+                                    name={'tgllulus' + education}
                                     render={({ field }) => (
                                       <FormItem className='flex flex-col'>
                                         <FormLabel>Tanggal Lulus</FormLabel>
@@ -339,7 +393,7 @@ export default function LamaranSheet() {
                                             </FormControl>
                                           </PopoverTrigger>
                                           <PopoverContent
-                                            className='w-auto p-0'
+                                            className='w-full p-0'
                                             align='start'
                                           >
                                             <Calendar
@@ -391,68 +445,174 @@ export default function LamaranSheet() {
                     </Button>
                   </Step>
                   <Step label={steps[2].label}>
-                    <div className='my-4 flex h-40 items-center justify-center rounded-md border bg-secondary text-primary'>
-                      <h1 className='text-xl'>Step</h1>
+                    <div className='my-4 space-y-3'>
+                      <FormField
+                        control={form.control}
+                        name='status'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status Lamaran</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value || ''}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Pilih Status' />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {EStatus.enumValues.map((status) => (
+                                  <SelectItem value={status} key={status}>
+                                    {status?.split('_').join(' ')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='tgl_dikirim'
+                        render={({ field }) => (
+                          <FormItem className='flex flex-col'>
+                            <FormLabel>Tanggal Dikirim</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant='outline'
+                                    className={cn(
+                                      'w-full pl-3 text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, 'EEEE, dd MMMM yyyy')
+                                    ) : (
+                                      <span>Pilih Tanggal Dikirim</span>
+                                    )}
+                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className='w-full p-0'
+                                align='start'
+                              >
+                                <Calendar
+                                  mode='single'
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='lampiran'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Lampiran</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder='Masukkan Lampiran'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='keterangan'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Keterangan</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder='Masukkan Keterangan'
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </Step>
                   <Step label={steps[3].label}>
                     <div className='my-4'>
-                      <FileUploaderMultiple />
+                      <FileUploaderMultiple
+                        pathFiles={pathFiles}
+                        setPathFiles={setPathFiles}
+                      />
                     </div>
                   </Step>
-
-                  <Footer />
+                  <Footer
+                    reset={reset}
+                    onSubmit={onSubmit}
+                    isLoading={isPending}
+                  />
                 </Stepper>
               </div>
             </div>
           </form>
         </Form>
-        <SheetFooter>
-          <SheetClose asChild>footer content</SheetClose>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
 }
 
-const Footer = () => {
-  const {
-    nextStep,
-    prevStep,
-    resetSteps,
-    isDisabledStep,
-    hasCompletedAllSteps,
-    isLastStep,
-    isOptionalStep,
-  } = useStepper();
+const Footer = ({
+  reset,
+  onSubmit,
+  isLoading,
+}: {
+  reset: UseFormReset<FieldValues>;
+  onSubmit: () => void;
+  isLoading: boolean;
+}) => {
+  const { nextStep, prevStep, isDisabledStep, isLastStep, isOptionalStep } =
+    useStepper();
   return (
     <>
-      {hasCompletedAllSteps && (
-        <div className='my-4 flex h-40 items-center justify-center rounded-md border bg-secondary text-primary'>
-          <h1 className='text-xl'>Woohoo! All steps completed! 🎉</h1>
-        </div>
-      )}
-      <div className='flex w-full justify-end gap-2'>
-        {hasCompletedAllSteps ? (
-          <Button size='sm' type='button' onClick={resetSteps}>
-            Reset
+      <div className='flex w-full justify-between gap-2'>
+        <Button
+          variant='destructive'
+          type='reset'
+          onClick={() => {
+            reset();
+          }}
+        >
+          Reset Form
+        </Button>
+        <div className='flex gap-2'>
+          <Button
+            disabled={isDisabledStep}
+            onClick={prevStep}
+            size='sm'
+            variant='secondary'
+            type='button'
+          >
+            Prev
           </Button>
-        ) : (
-          <>
-            <Button
-              disabled={isDisabledStep}
-              onClick={prevStep}
-              size='sm'
-              variant='secondary'
-              type='button'
-            >
-              Prev
-            </Button>
-            <Button size='sm' onClick={nextStep} type='button'>
-              {isLastStep ? 'Finish' : isOptionalStep ? 'Skip' : 'Next'}
-            </Button>
-          </>
-        )}
+          <Button
+            size='sm'
+            onClick={() => (isLastStep ? onSubmit() : nextStep())}
+            type='button'
+            disabled={isLoading}
+          >
+            {isLastStep ? 'Submit' : isOptionalStep ? 'Skip' : 'Next'}
+          </Button>
+        </div>
       </div>
     </>
   );

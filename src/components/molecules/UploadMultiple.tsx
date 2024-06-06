@@ -11,10 +11,16 @@ import { supabase } from '@/lib/supabase';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-const FileUploaderMultiple = () => {
+const FileUploaderMultiple = ({
+  pathFiles,
+  setPathFiles,
+}: {
+  pathFiles: string[];
+  setPathFiles: React.Dispatch<React.SetStateAction<string[]>>;
+}) => {
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pathFiles, setPathFiles] = useState<string[]>([]);
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
@@ -104,7 +110,7 @@ const FileUploaderMultiple = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [files]);
+  }, [files, setPathFiles]);
 
   return (
     <Fragment>
@@ -117,10 +123,6 @@ const FileUploaderMultiple = () => {
           <h4 className=' mb-1 text-2xl font-medium text-card-foreground/80'>
             Drop files here or click to upload.
           </h4>
-          <div className=' text-xs text-muted-foreground'>
-            ( This is just a demo drop zone. Selected files are not actually
-            uploaded.)
-          </div>
         </div>
       </div>
       {files.length ? (

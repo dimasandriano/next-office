@@ -1,5 +1,6 @@
 import instance from '@/lib/axios/instance';
 
+import { TSchemaLamaran } from '@/types/lamaran.type';
 import { TParams } from '@/types/params.type';
 
 type TParamsLamaran = TParams & {
@@ -14,5 +15,10 @@ export const lamaranService = {
       params,
     });
     return data;
+  },
+
+  createLamaran: async (data: Partial<TSchemaLamaran>) => {
+    const { data: response } = await instance.post('/lamaran/create', data);
+    return response;
   },
 };

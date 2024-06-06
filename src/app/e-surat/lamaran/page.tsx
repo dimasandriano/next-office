@@ -45,7 +45,7 @@ export default function Page() {
   });
   const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['surat', debounceSearch, status, date],
+      queryKey: ['lamaran', debounceSearch, status, date],
       queryFn: async ({ pageParam = 1 }) =>
         await lamaranService.getAllLamaran({
           page: pageParam as number,
