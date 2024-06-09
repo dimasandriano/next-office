@@ -91,8 +91,6 @@ export default function LamaranCreateSheet() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log(getValues());
     // grouping pendidikan
     const grouped = _.groupBy(Object.entries(getValues()), ([key, _value]) =>
       key ? key.match(/[a-zA-Z]+/)?.[0] : null,

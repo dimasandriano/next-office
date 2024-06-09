@@ -7,6 +7,7 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
+import { DisposisiSheet } from '@/components/sheet/disposisi.sheet';
 import LamaranDetailSheet from '@/components/sheet/lamaran.detail.sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -82,7 +83,16 @@ export default function useLamaranColumn(widthTableContainer: number) {
           );
         },
       },
-
+      {
+        id: 'disposisi',
+        header: 'Disposisi',
+        meta: {
+          sizeScale: 4,
+        },
+        cell: ({ row }) => {
+          return <DisposisiSheet lamaran={row.original} />;
+        },
+      },
       {
         id: 'aksi',
         header: 'Aksi',

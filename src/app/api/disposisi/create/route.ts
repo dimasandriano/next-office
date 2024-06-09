@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 import { UnauthorizedError } from '@/lib/exceptions';
+import useDecodedTokenJWT from '@/hooks/useDecodedTokenJWT';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
@@ -16,6 +17,7 @@ const createSchema = createInsertSchema(disposisi, {
 export async function POST(request: NextRequest) {
   const verify = useVerifyJwt(request);
   if (!verify) return UnauthorizedError();
+  const { username } = useDecodedTokenJWT(request);
   const body: TSchemaDisposisi = await request.json();
   const result = createSchema.safeParse(body);
   if (!result.success) {
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
       divisi_id,
       surat_id,
       lamaran_id,
+      created_by: username,
       tgl_diterima: tgl_diterima && new Date(tgl_diterima),
     })
     .returning();

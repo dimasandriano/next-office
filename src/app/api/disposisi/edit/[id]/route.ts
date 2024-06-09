@@ -5,7 +5,11 @@ import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
-import { UnauthorizedError } from '@/lib/exceptions';
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
@@ -24,25 +28,10 @@ export async function PUT(
     where: eq(disposisi.id, Number(id)),
   });
 
-  if (!cekId) {
-    return NextResponse.json(
-      { status: 'error', error: 'Disposisi tidak ditemukan' },
-      {
-        status: 404,
-      },
-    );
-  }
+  if (!cekId) return NotFoundError('Data disposisi tidak ditemukan');
   const body: TSchemaDisposisi = await request.json();
   const result = editSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success) return BadRequestError(result.error);
   const {
     isi,
     note_pengirim,
