@@ -10,9 +10,9 @@ export const UnauthorizedError = () => {
   );
 };
 
-export const ForbiddenError = () => {
+export const ForbiddenError = (error?: string) => {
   return NextResponse.json(
-    { status: 'error', error: 'Forbidden' },
+    { status: 'error', error: error || 'Forbidden' },
     {
       status: 403,
     },
