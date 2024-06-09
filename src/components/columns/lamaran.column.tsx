@@ -1,13 +1,13 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
-import { Eye, PenBox } from 'lucide-react';
-import Link from 'next/link';
+import { PenBox } from 'lucide-react';
 import React from 'react';
 
-import { hashid } from '@/lib/hashid';
 import { generateSize } from '@/lib/tanstack/column';
 
+import { DeleteModal } from '@/components/modal/delete.modal';
+import LamaranDetailSheet from '@/components/sheet/lamaran.detail.sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -93,17 +93,11 @@ export default function useLamaranColumn(widthTableContainer: number) {
           return (
             <div>
               <div className='flex gap-2'>
-                <Button size='icon' variant='outline' asChild>
-                  <Link
-                    href={'/e-surat/surat/' + hashid.encode(row.original.id)}
-                  >
-                    <Eye />
-                  </Link>
-                </Button>
+                <LamaranDetailSheet data={row.original} />
                 <Button size='icon' variant='default'>
                   <PenBox />
                 </Button>
-                {/* <DeleteModal surat={row.original} /> */}
+                <DeleteModal lamaran={row.original} />
               </div>
             </div>
           );

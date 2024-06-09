@@ -21,4 +21,9 @@ export const lamaranService = {
     const { data: response } = await instance.post('/lamaran/create', data);
     return response;
   },
+
+  deleteLamaran: async (id: string) => {
+    const { data: result } = await instance.delete(`/lamaran/delete/${id}`);
+    return result.data;
+  },
 };

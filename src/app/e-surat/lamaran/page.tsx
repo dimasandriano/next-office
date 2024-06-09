@@ -11,7 +11,7 @@ import getNextPageParam from '@/hooks/getNextPageParam';
 
 import useLamaranColumn from '@/components/columns/lamaran.column';
 import { TableVirtualized } from '@/components/molecules/TableVirtualized';
-import LamaranSheet from '@/components/sheet/lamaran.sheet';
+import LamaranCreateSheet from '@/components/sheet/lamaran.create.sheet';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -123,7 +123,7 @@ export default function Page() {
             </PopoverContent>
           </Popover>
         </div>
-        <LamaranSheet />
+        <LamaranCreateSheet />
       </div>
       <div ref={tableContainerRef}>
         <TableVirtualized

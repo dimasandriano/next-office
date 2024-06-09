@@ -62,7 +62,7 @@ import { lamaranService } from '@/services/lamaran.service';
 
 import { TSchemaLamaran } from '@/types/lamaran.type';
 
-export default function LamaranSheet() {
+export default function LamaranCreateSheet() {
   const steps = [
     { label: 'Data Diri' },
     { label: 'Pendidikan' },
@@ -98,22 +98,25 @@ export default function LamaranSheet() {
       key ? key.match(/[a-zA-Z]+/)?.[0] : null,
     );
     const combinedPendidikan = _.zipWith(
-      grouped.ipk,
-      grouped.gelar,
-      grouped.jenjang,
+      grouped.universitas,
       grouped.prodi,
+      grouped.jenjang,
+      grouped.gelar,
+      grouped.ipk,
       grouped.tgllulus,
       (
-        [_ipkKey, ipkValue],
-        [_gelarKey, gelarValue],
-        [_jenjangKey, jenjangValue],
+        [_universitasKey, universitasValue],
         [_prodiKey, prodiValue],
+        [_jenjangKey, jenjangValue],
+        [_gelarKey, gelarValue],
+        [_ipkKey, ipkValue],
         [_tgllulusKey, tgllulusValue],
       ) => ({
-        ipk: ipkValue,
-        gelar: gelarValue,
-        jenjang: jenjangValue,
+        universitas: universitasValue,
         prodi: prodiValue,
+        jenjang: jenjangValue,
+        gelar: gelarValue,
+        ipk: ipkValue,
         tgllulus: tgllulusValue,
       }),
     );
