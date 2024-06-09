@@ -5,12 +5,13 @@ import { NextRequest } from 'next/server';
 
 import { TSchemaUsers } from '@/types/users.type';
 
-export default function useDecodedTokenJWT(request: NextRequest) {
+export default function useDecodedTokenJWT(request?: NextRequest) {
   const token = request
     ? request.cookies.get('token')?.value
     : Cookies.get('token') || ' ';
 
   const decoded = jwt.decode(token as any) as TSchemaUsers;
+
   return {
     id: decoded?.id,
     role: decoded?.role,
