@@ -9,6 +9,8 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { divisi } from '@/lib/drizzle/schema/divisi.schema';
+import { lamaran } from '@/lib/drizzle/schema/lamaran.schema';
+import { surat } from '@/lib/drizzle/schema/surat.schema';
 
 export const disposisi = pgTable('disposisi', {
   id: serial('id').primaryKey(),
@@ -30,14 +32,14 @@ export const disposisiDivisiRelations = relations(disposisi, ({ one }) => ({
   }),
 }));
 export const disposisiSuratRelations = relations(disposisi, ({ one }) => ({
-  surat: one(divisi, {
+  surat: one(surat, {
     fields: [disposisi.surat_id],
-    references: [divisi.id],
+    references: [surat.id],
   }),
 }));
 export const disposisiLamaranRelations = relations(disposisi, ({ one }) => ({
-  lamaran: one(divisi, {
+  lamaran: one(lamaran, {
     fields: [disposisi.lamaran_id],
-    references: [divisi.id],
+    references: [lamaran.id],
   }),
 }));

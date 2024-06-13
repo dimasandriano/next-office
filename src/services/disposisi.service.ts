@@ -1,6 +1,7 @@
 import instance from '@/lib/axios/instance';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
+import { TParams } from '@/types/params.type';
 
 export const disposisiService = {
   getAllDisposisi: async () => {
@@ -19,5 +20,10 @@ export const disposisiService = {
       data,
     );
     return result.data;
+  },
+
+  getAllDisposisiUser: async (params: TParams) => {
+    const { data } = await instance.get('/disposisi/user/list', { params });
+    return data;
   },
 };

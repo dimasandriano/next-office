@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -53,11 +53,18 @@ type TProps = {
 };
 
 export function DisposisiSheet({ lamaran }: TProps) {
+  const [open, setOpen] = useState(false);
   const isCreate = useMemo(() => !lamaran?.disposisi, [lamaran]);
   const form = useForm({
     mode: 'onChange',
   });
-  const { handleSubmit, reset, getValues, setValue } = form;
+  const {
+    handleSubmit,
+    reset,
+    getValues,
+    setValue,
+    formState: { isDirty },
+  } = form;
 
   const { mutate: mutateCreateDisposisi, isPending: isPendingCreateDisposisi } =
     useMutation({
@@ -69,6 +76,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
         reset();
         queryClient.invalidateQueries({ queryKey: ['lamaran'] });
         queryClient.invalidateQueries({ queryKey: ['surat'] });
+        setOpen(false);
       },
       onError: () => {
         toast.error('Gagal Disposisi');
@@ -84,6 +92,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
         reset();
         queryClient.invalidateQueries({ queryKey: ['lamaran'] });
         queryClient.invalidateQueries({ queryKey: ['surat'] });
+        setOpen(false);
       },
       onError: () => {
         toast.error('Gagal Update Disposisi');
@@ -128,7 +137,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
     }
   }, [isCreate, lamaran, setValue]);
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Badge
           variant={lamaran?.disposisi ? 'default' : 'secondary'}
@@ -241,7 +250,11 @@ export function DisposisiSheet({ lamaran }: TProps) {
             <div className='flex justify-end'>
               <Button
                 type='submit'
-                disabled={isPendingCreateDisposisi || isPendingUpdateDisposisi}
+                disabled={
+                  isPendingCreateDisposisi ||
+                  isPendingUpdateDisposisi ||
+                  !isDirty
+                }
               >
                 {isCreate ? 'Disposisikan' : 'Update Disposisi'}
               </Button>

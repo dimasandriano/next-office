@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 export default function Sidebar() {
   return (
     <div className='h-screen w-full space-y-5 p-3'>
-      <div className='pb-2 text-center'>LOGO</div>
+      <div className='text-center text-2xl font-bold'>E-SURAT</div>
       <div className='flex h-[calc(100vh-75px)] flex-col justify-between'>
         <div className='flex flex-col justify-start gap-5'>
           <Button variant='outline' asChild isSidebar>

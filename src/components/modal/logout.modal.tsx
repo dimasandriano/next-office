@@ -21,7 +21,7 @@ export default function LogoutModal() {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button variant='outline' className='w-full'>
+        <Button variant='destructive' className='w-full'>
           <div className='flex items-center gap-3'>
             Logout
             <ArrowRight />
