@@ -44,7 +44,8 @@ export default function Page() {
   });
   return (
     <div className='space-y-3'>
-      <div className='flex justify-end'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-2xl font-semibold'>Dashboard</h1>
         <Popover>
           <PopoverTrigger asChild className='w-1/4'>
             <Button

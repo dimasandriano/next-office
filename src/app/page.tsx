@@ -1,13 +1,5 @@
-'use client';
-import React from 'react';
-
-import DarkModeToggle from '@/components/molecules/DarkModeToggle';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return (
-    <div>
-      page
-      <DarkModeToggle />
-    </div>
-  );
+  return redirect('/login');
 }

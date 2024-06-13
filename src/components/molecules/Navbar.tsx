@@ -19,8 +19,8 @@ export default function Navbar() {
       )}
       <div className='flex items-center gap-3'>
         <Avatar>
-          <AvatarImage src='https://github.com/shadcn.png' />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src='https://github.com/shadcn.png' alt='avatar' />
+          <AvatarFallback>{username?.slice(0, 1) ?? ''}</AvatarFallback>
         </Avatar>
         <div className='flex flex-col'>
           <h5 className='leading-none'>{username}</h5>
