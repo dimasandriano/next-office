@@ -175,7 +175,7 @@ export default function Page() {
                         <div className='border-t border-border p-3'>
                           <TimePicker
                             setDate={field.onChange}
-                            date={field.value}
+                            date={field.value || new Date()}
                           />
                         </div>
                       </PopoverContent>

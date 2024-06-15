@@ -5,6 +5,7 @@ import React from 'react';
 
 import { generateSize } from '@/lib/tanstack/column';
 
+import { DisposisiViewSheet } from '@/components/sheet/disposisi-view.sheet';
 import { Badge } from '@/components/ui/badge';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
@@ -104,6 +105,16 @@ export default function useViewSuratColumn(widthTableContainer: number) {
               {row.original?.surat?.sifat}
             </Badge>
           );
+        },
+      },
+      {
+        id: 'disposisi',
+        header: 'Disposisi',
+        meta: {
+          sizeScale: 3,
+        },
+        cell: ({ row }) => {
+          return <DisposisiViewSheet disposisi={row.original} type='surat' />;
         },
       },
       {

@@ -1,12 +1,7 @@
 import React from 'react';
 
-import Navbar from '@/components/molecules/Navbar';
+import UserLayout from '@/components/layout/user.layout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <Navbar />
-      <div className='p-5'>{children}</div>
-    </div>
-  );
+  return <UserLayout>{children}</UserLayout>;
 }

@@ -5,6 +5,7 @@ import React from 'react';
 
 import { generateSize } from '@/lib/tanstack/column';
 
+import { DisposisiViewSheet } from '@/components/sheet/disposisi-view.sheet';
 import LamaranDetailSheet from '@/components/sheet/lamaran.detail.sheet';
 import { Badge } from '@/components/ui/badge';
 
@@ -72,7 +73,7 @@ export default function useViewLamaranColumn(widthTableContainer: number) {
       },
       {
         id: 'status',
-        header: 'Status Surat',
+        header: 'Status',
         meta: {
           sizeScale: 4,
         },
@@ -82,6 +83,16 @@ export default function useViewLamaranColumn(widthTableContainer: number) {
               {row.original?.lamaran?.status?.split('_').join(' ')}
             </Badge>
           );
+        },
+      },
+      {
+        id: 'disposisi',
+        header: 'Disposisi',
+        meta: {
+          sizeScale: 3,
+        },
+        cell: ({ row }) => {
+          return <DisposisiViewSheet disposisi={row.original} type='lamaran' />;
         },
       },
       {

@@ -3,10 +3,12 @@
 
 import { format } from 'date-fns';
 import { isArray } from 'lodash';
-import { Eye } from 'lucide-react';
-import { useMemo } from 'react';
+import { Eye, SquareArrowOutUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
 import { isJsonString } from '@/lib/isjson';
+import { supabase } from '@/lib/supabase';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,6 +40,24 @@ export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
       return [];
     }
   }, [data?.pendidikan]);
+  const files: string[] = useMemo(() => {
+    if (isJsonString(data.files || '')) {
+      return JSON.parse(data.files || '{}');
+    } else {
+      return [];
+    }
+  }, [data?.files]);
+  const [dataFiles, setDataFiles] = useState<string[]>([]);
+  useEffect(() => {
+    if (isArray(files)) {
+      const data = files.map((file) => {
+        const { data } = supabase.storage.from('dokumen').getPublicUrl(file);
+        return data.publicUrl;
+      });
+      setDataFiles(data);
+    }
+  }, [files]);
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -139,6 +159,21 @@ export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
           </div>
           <div className='border-y-2 py-3'>
             <h1 className='text-2xl font-medium'>Dokumen</h1>
+            <div className='grid grid-cols-12 gap-3'>
+              {dataFiles?.map((data, index) => (
+                <Button
+                  variant='outline'
+                  className='col-span-4 flex items-center gap-2'
+                  key={index}
+                  asChild
+                >
+                  <Link href={data} target='_blank'>
+                    <span className='truncate'>{files[index]}</span>
+                    <SquareArrowOutUpRight />
+                  </Link>
+                </Button>
+              ))}
+            </div>
           </div>
         </ScrollArea>
       </SheetContent>

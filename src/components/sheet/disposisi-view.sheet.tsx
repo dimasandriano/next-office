@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -46,15 +46,14 @@ import { divisiService } from '@/services/divisi.service';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
-import { TSchemaLamaran } from '@/types/lamaran.type';
 
 type TProps = {
-  lamaran?: TSchemaLamaran;
+  disposisi: TSchemaDisposisi;
+  type: 'surat' | 'lamaran';
 };
 
-export function DisposisiSheet({ lamaran }: TProps) {
+export function DisposisiViewSheet({ disposisi, type }: TProps) {
   const [open, setOpen] = useState(false);
-  const isCreate = useMemo(() => !lamaran?.disposisi, [lamaran]);
   const form = useForm({
     mode: 'onChange',
   });
@@ -66,22 +65,6 @@ export function DisposisiSheet({ lamaran }: TProps) {
     formState: { isDirty },
   } = form;
 
-  const { mutate: mutateCreateDisposisi, isPending: isPendingCreateDisposisi } =
-    useMutation({
-      mutationKey: ['create-disposisi'],
-      mutationFn: (data: Partial<TSchemaDisposisi>) =>
-        disposisiService.createDisposisi(data),
-      onSuccess: () => {
-        toast.success('Berhasil Disposisi');
-        reset();
-        queryClient.invalidateQueries({ queryKey: ['lamaran'] });
-        queryClient.invalidateQueries({ queryKey: ['surat'] });
-        setOpen(false);
-      },
-      onError: () => {
-        toast.error('Gagal Disposisi');
-      },
-    });
   const { mutate: mutateUpdateDisposisi, isPending: isPendingUpdateDisposisi } =
     useMutation({
       mutationKey: ['update-disposisi'],
@@ -90,8 +73,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
       onSuccess: () => {
         toast.success('Berhasil Update Disposisi');
         reset();
-        queryClient.invalidateQueries({ queryKey: ['lamaran'] });
-        queryClient.invalidateQueries({ queryKey: ['surat'] });
+        queryClient.invalidateQueries({ queryKey: ['disposisi'] });
         setOpen(false);
       },
       onError: () => {
@@ -100,27 +82,12 @@ export function DisposisiSheet({ lamaran }: TProps) {
     });
 
   const onSubmit = useCallback(() => {
-    if (isCreate) {
-      mutateCreateDisposisi({
-        ...getValues(),
-        divisi_id: Number(getValues().divisi_id),
-        lamaran_id: lamaran && lamaran?.id,
-      });
-      return;
-    } else {
-      mutateUpdateDisposisi({
-        ...getValues(),
-        divisi_id: Number(getValues().divisi_id),
-        lamaran_id: lamaran && lamaran?.id,
-      });
-    }
-  }, [
-    getValues,
-    isCreate,
-    lamaran,
-    mutateCreateDisposisi,
-    mutateUpdateDisposisi,
-  ]);
+    mutateUpdateDisposisi({
+      id: Number(getValues().id),
+      note_penerima: getValues().note_penerima,
+      tgl_diterima: getValues().tgl_diterima,
+    });
+  }, [getValues, mutateUpdateDisposisi]);
 
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
@@ -128,29 +95,29 @@ export function DisposisiSheet({ lamaran }: TProps) {
   });
 
   useEffect(() => {
-    if (!isCreate && lamaran) {
-      setValue('id', lamaran?.disposisi?.id);
-      setValue('divisi_id', lamaran?.disposisi?.divisi_id?.toString());
-      setValue('tgl_diterima', lamaran?.disposisi?.tgl_diterima);
-      setValue('isi', lamaran?.disposisi?.isi);
-      setValue('note_pengirim', lamaran?.disposisi?.note_pengirim);
-      setValue('note_penerima', lamaran?.disposisi?.note_penerima);
+    if (disposisi) {
+      setValue('id', disposisi?.id);
+      setValue('divisi_id', disposisi?.divisi_id?.toString());
+      setValue('tgl_diterima', disposisi?.tgl_diterima);
+      setValue('isi', disposisi?.isi);
+      setValue('note_pengirim', disposisi?.note_pengirim);
+      setValue('note_penerima', disposisi?.note_penerima);
     }
-  }, [isCreate, lamaran, setValue]);
+  }, [disposisi, setValue]);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Badge
-          variant={lamaran?.disposisi ? 'default' : 'secondary'}
-          className='cursor-pointer'
-        >
-          {lamaran?.disposisi ? 'Terdisposisi' : 'Disposisikan'}
+        <Badge variant='default' className='cursor-pointer'>
+          Lihat Disposisi
         </Badge>
       </SheetTrigger>
       <SheetContent className='min-w-[50%]'>
         <SheetHeader>
           <SheetTitle>
-            {!isCreate ? 'Edit ' : ''}Disposisi Lamaran Dari {lamaran?.pelamar}
+            Edit Disposisi {type === 'surat' ? 'Surat ' : 'Lamaran '}
+            {type === 'surat'
+              ? disposisi?.surat?.no_surat
+              : disposisi?.lamaran?.pelamar}
           </SheetTitle>
         </SheetHeader>
         <Form {...form}>
@@ -202,6 +169,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value?.toString()}
+                    disabled
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -229,7 +197,11 @@ export function DisposisiSheet({ lamaran }: TProps) {
                 <FormItem>
                   <FormLabel>Isi Disposisi</FormLabel>
                   <FormControl>
-                    <Textarea placeholder='Masukkan isi disposisi' {...field} />
+                    <Textarea
+                      placeholder='Masukkan isi disposisi'
+                      {...field}
+                      disabled
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -242,7 +214,11 @@ export function DisposisiSheet({ lamaran }: TProps) {
                 <FormItem>
                   <FormLabel>Catatan Pengirim</FormLabel>
                   <FormControl>
-                    <Textarea placeholder='Masukkan Catatan' {...field} />
+                    <Textarea
+                      placeholder='Masukkan Catatan'
+                      {...field}
+                      disabled
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -255,11 +231,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
                 <FormItem>
                   <FormLabel>Catatan Penerima</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder='Masukkan Catatan'
-                      disabled
-                      {...field}
-                    />
+                    <Textarea placeholder='Masukkan Catatan' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -268,13 +240,9 @@ export function DisposisiSheet({ lamaran }: TProps) {
             <div className='flex justify-end'>
               <Button
                 type='submit'
-                disabled={
-                  isPendingCreateDisposisi ||
-                  isPendingUpdateDisposisi ||
-                  !isDirty
-                }
+                disabled={isPendingUpdateDisposisi || !isDirty}
               >
-                {isCreate ? 'Disposisikan' : 'Update Disposisi'}
+                Update Disposisi
               </Button>
             </div>
           </form>

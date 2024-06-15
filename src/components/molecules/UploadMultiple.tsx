@@ -89,8 +89,7 @@ const FileUploaderMultiple = ({
     try {
       const uploadPromises = files.map((file) => {
         const filePath =
-          format(new Date(), 'dd-MM-yyyy_HH-mm-ss_') +
-          file.name?.replace(/ /g, '_');
+          format(new Date(), 'dd-MM-yyyy_') + file.name?.replace(/ /g, '_');
         return supabase.storage.from('dokumen').upload(filePath, file);
       });
 
