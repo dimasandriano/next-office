@@ -26,4 +26,12 @@ export const lamaranService = {
     const { data: result } = await instance.delete(`/lamaran/delete/${id}`);
     return result.data;
   },
+
+  updateLamaran: async (data: Partial<TSchemaLamaran>) => {
+    const { data: response } = await instance.put(
+      '/lamaran/edit/' + data.id,
+      data,
+    );
+    return response;
+  },
 };

@@ -1,10 +1,11 @@
+import { eq } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
-import { UnauthorizedError } from '@/lib/exceptions';
+import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 import useDecodedTokenJWT from '@/hooks/useDecodedTokenJWT';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
@@ -20,15 +21,7 @@ export async function POST(request: NextRequest) {
   const { username } = useDecodedTokenJWT(request);
   const body: TSchemaDisposisi = await request.json();
   const result = createSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success) return BadRequestError(result.error);
   const {
     isi,
     note_pengirim,
@@ -38,6 +31,22 @@ export async function POST(request: NextRequest) {
     surat_id,
     lamaran_id,
   } = body;
+
+  if (surat_id) {
+    const checkDisposisiSurat = await db.query.disposisi.findFirst({
+      where: eq(disposisi.surat_id, surat_id),
+    });
+    if (checkDisposisiSurat) return BadRequestError('Surat sudah terdisposisi');
+  }
+
+  if (lamaran_id) {
+    const checkDisposisiLamaran = await db.query.disposisi.findFirst({
+      where: eq(disposisi.lamaran_id, lamaran_id),
+    });
+    if (checkDisposisiLamaran)
+      return BadRequestError('Lamaran sudah terdisposisi');
+  }
+
   const data = await db
     .insert(disposisi)
     .values({

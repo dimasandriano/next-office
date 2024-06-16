@@ -6,7 +6,7 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DisposisiViewSheet } from '@/components/sheet/disposisi-view.sheet';
-import LamaranDetailSheet from '@/components/sheet/lamaran.detail.sheet';
+import LamaranDetailSheet from '@/components/sheet/lamaran-detail.sheet';
 import { Badge } from '@/components/ui/badge';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';

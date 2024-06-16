@@ -1,7 +1,7 @@
 'use client';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, ChevronsUpDown } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -12,6 +12,14 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import {
   Form,
   FormControl,
@@ -25,13 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Sheet,
   SheetContent,
@@ -54,6 +55,7 @@ type TProps = {
 
 export function DisposisiSheet({ lamaran }: TProps) {
   const [open, setOpen] = useState(false);
+  const [openSelect, setOpenSelect] = useState(false);
   const isCreate = useMemo(() => !lamaran?.disposisi, [lamaran]);
   const form = useForm({
     mode: 'onChange',
@@ -110,6 +112,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
     } else {
       mutateUpdateDisposisi({
         ...getValues(),
+        id: lamaran?.disposisi?.id,
         divisi_id: Number(getValues().divisi_id),
         lamaran_id: lamaran && lamaran?.id,
       });
@@ -125,8 +128,8 @@ export function DisposisiSheet({ lamaran }: TProps) {
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
     queryFn: () => divisiService.getAllDivisiSelection(),
+    enabled: openSelect,
   });
-
   useEffect(() => {
     if (!isCreate && lamaran) {
       setValue('id', lamaran?.disposisi?.id);
@@ -137,6 +140,16 @@ export function DisposisiSheet({ lamaran }: TProps) {
       setValue('note_penerima', lamaran?.disposisi?.note_penerima);
     }
   }, [isCreate, lamaran, setValue]);
+
+  const selectionDivisi = useMemo(() => {
+    return dataDivisi?.map((item) => {
+      return {
+        value: item.id.toString(),
+        label: item.nama,
+      };
+    });
+  }, [dataDivisi]);
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -197,27 +210,48 @@ export function DisposisiSheet({ lamaran }: TProps) {
               control={form.control}
               name='divisi_id'
               render={({ field }) => (
-                <FormItem>
+                <FormItem className='w-full'>
                   <FormLabel>Divisi</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value?.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Pilih Divisi' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {dataDivisi?.map((divisi, index) => {
-                        return (
-                          <SelectItem value={divisi.id?.toString()} key={index}>
-                            {divisi.nama}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={openSelect} onOpenChange={setOpenSelect}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='w-full justify-between font-normal'
+                      >
+                        {field.value
+                          ? selectionDivisi?.find(
+                              (divisi) => divisi.value === field.value,
+                            )?.label
+                          : 'Pilih Divisi'}
+                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className='w-[calc(50vw-3rem)] p-0'
+                      align='start'
+                    >
+                      <Command>
+                        <CommandInput placeholder='Cari divisi...' />
+                        <CommandList>
+                          <CommandEmpty>Divisi tidak ditemukan</CommandEmpty>
+                          <CommandGroup>
+                            {selectionDivisi?.map((divisi) => (
+                              <CommandItem
+                                key={divisi.value}
+                                value={divisi.label}
+                                onSelect={() => {
+                                  form.setValue('divisi_id', divisi.value);
+                                  setOpenSelect(false);
+                                }}
+                              >
+                                {divisi.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

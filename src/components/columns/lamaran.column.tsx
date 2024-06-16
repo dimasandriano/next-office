@@ -1,16 +1,15 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
-import { PenBox } from 'lucide-react';
 import React from 'react';
 
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
 import { DisposisiSheet } from '@/components/sheet/disposisi.sheet';
-import LamaranDetailSheet from '@/components/sheet/lamaran.detail.sheet';
+import LamaranDetailSheet from '@/components/sheet/lamaran-detail.sheet';
+import LamaranEditSheet from '@/components/sheet/lamaran-edit.sheet';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 import { TSchemaLamaran } from '@/types/lamaran.type';
 
@@ -104,9 +103,7 @@ export default function useLamaranColumn(widthTableContainer: number) {
             <div>
               <div className='flex gap-2'>
                 <LamaranDetailSheet data={row.original} />
-                <Button size='icon' variant='default'>
-                  <PenBox />
-                </Button>
+                <LamaranEditSheet data={row.original} />
                 <DeleteModal lamaran={row.original} />
               </div>
             </div>
