@@ -2,12 +2,13 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import _ from 'lodash';
+import _, { isArray } from 'lodash';
 import { CalendarIcon, PenBox } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
+import { isJsonString } from '@/lib/isjson';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scrol-area';
 import {
   Select,
   SelectContent,
@@ -63,6 +65,7 @@ import { lamaranService } from '@/services/lamaran.service';
 import { TSchemaLamaran } from '@/types/lamaran.type';
 
 export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
+  const [open, setOpen] = useState(false);
   const steps = [
     { label: 'Data Diri' },
     { label: 'Pendidikan' },
@@ -72,9 +75,20 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
   const form = useForm({
     mode: 'onChange',
   });
+  const pendidikan = useMemo(() => {
+    return isJsonString(data.pendidikan || '')
+      ? JSON.parse(data.pendidikan || '{}')
+      : [];
+  }, [data?.pendidikan]);
+
+  const files = useMemo(() => {
+    return isJsonString(data.files || '') ? JSON.parse(data.files || '{}') : [];
+  }, [data?.files]);
   const { handleSubmit, resetField, reset, getValues, setValue } = form;
   const [pathFiles, setPathFiles] = useState<string[]>([]);
-  const [educations, setEducations] = useState<number[]>([1]);
+  const [educations, setEducations] = useState<number[]>(
+    isArray(pendidikan) ? pendidikan.map((_, index) => index + 1) : [1],
+  );
 
   const { mutate: mutateUpdateLamaran, isPending } = useMutation({
     mutationKey: ['updatelamaran'],
@@ -84,6 +98,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
       toast.success('Lamaran Berhasil Diubah');
       reset();
       setPathFiles([]);
+      setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
     },
     onError: () => toast.error('Lamaran Gagal Diubah'),
@@ -98,8 +113,20 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
     setValue('tgl_dikirim', data.tgl_dikirim);
     setValue('lampiran', data.lampiran);
     setValue('keterangan', data.keterangan);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+    if (isArray(pendidikan)) {
+      pendidikan.forEach((item, index) => {
+        setValue(`universitas${index + 1}`, item.universitas);
+        setValue(`prodi${index + 1}`, item.prodi);
+        setValue(`jenjang${index + 1}`, item.jenjang);
+        setValue(`gelar${index + 1}`, item.gelar);
+        setValue(`ipk${index + 1}`, item.ipk);
+        setValue(`tgllulus${index + 1}`, item.tgllulus);
+      });
+    }
+    if (isArray(files)) {
+      setPathFiles(files.map((item) => item));
+    }
+  }, [data, files, pendidikan, setValue]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = useCallback(() => {
@@ -133,14 +160,13 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
     mutateUpdateLamaran({
       id: data.id,
       pendidikan: JSON.stringify(combinedPendidikan),
-      files: JSON.stringify(pathFiles),
+      files: pathFiles.length > 0 ? JSON.stringify(pathFiles) : undefined,
       tgl_dikirim: getValues().tgl_dikirim as Date,
       ...getValues(),
     });
   }, [data.id, getValues, mutateUpdateLamaran, pathFiles]);
-
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size='icon' variant='default'>
           <PenBox />
@@ -150,429 +176,439 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
         <SheetHeader>
           <SheetTitle>Edit Lamaran</SheetTitle>
         </SheetHeader>
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mt-5 flex flex-col justify-between'>
-              <div className='flex w-full flex-col gap-4'>
-                <Stepper initialStep={0} steps={steps}>
-                  <Step label={steps[0].label}>
-                    <div className='my-4 space-y-3'>
-                      <FormField
-                        control={form.control}
-                        name='tgl'
-                        render={({ field }) => (
-                          <FormItem className='flex flex-col'>
-                            <FormLabel>Tanggal</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    className={cn(
-                                      'w-full pl-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, 'EEEE, dd MMMM yyyy')
-                                    ) : (
-                                      <span>Pilih Tanggal</span>
-                                    )}
-                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className='w-auto p-0'
-                                align='start'
-                              >
-                                <Calendar
-                                  mode='single'
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='pelamar'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nama Pelamar</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Masukkan Nama Pelamar'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='ttl'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tempat, Tgl Lahir</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Masukkan Tempat, Tgl Lahir'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='no_hp'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>No. HP</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Masukkan No. HP'
-                                type='number'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </Step>
-                  <Step label={steps[1].label}>
-                    <div className='my-4 space-y-3'>
-                      <Accordion type='single' collapsible className='w-full'>
-                        {educations.map((education, index) => (
-                          <div
-                            className='flex w-full items-start justify-between gap-3'
-                            key={index}
-                          >
-                            <AccordionItem
-                              value={index.toString()}
-                              className='w-full'
-                            >
-                              <AccordionTrigger>
-                                Pendidikan ke {index + 1}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                <div className='w-full space-y-3 px-3'>
-                                  <FormField
-                                    control={form.control}
-                                    name={'universitas' + education}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>
-                                          Universitas / Sekolah
-                                        </FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder='Masukkan Universitas / Sekolah'
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
+        <ScrollArea className='h-[90vh] pr-5'>
+          <Form {...form}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className='mt-5 flex flex-col justify-between'>
+                <div className='flex w-full flex-col gap-4'>
+                  <Stepper initialStep={0} steps={steps}>
+                    <Step label={steps[0].label}>
+                      <div className='my-4 space-y-3'>
+                        <FormField
+                          control={form.control}
+                          name='tgl'
+                          render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                              <FormLabel>Tanggal</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant='outline'
+                                      className={cn(
+                                        'w-full pl-3 text-left font-normal',
+                                        !field.value && 'text-muted-foreground',
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(
+                                          field.value,
+                                          'EEEE, dd MMMM yyyy',
+                                        )
+                                      ) : (
+                                        <span>Pilih Tanggal</span>
+                                      )}
+                                      <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className='w-auto p-0'
+                                  align='start'
+                                >
+                                  <Calendar
+                                    mode='single'
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    initialFocus
                                   />
-                                  <FormField
-                                    control={form.control}
-                                    name={'prodi' + education}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>Prodi / Jurusan</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder='Masukkan Prodi / Jurusan'
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name={'gelar' + education}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>Gelar</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder='Masukkan Gelar'
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name={'jenjang' + education}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>
-                                          Jenjang Pendidikan
-                                        </FormLabel>
-                                        <Select
-                                          onValueChange={field.onChange}
-                                          value={field.value || ''}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue placeholder='Pilih Jenjang Pendidikan' />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(
-                                              Object.keys(EJenjang) as Array<
-                                                keyof typeof EJenjang
-                                              >
-                                            ).map((jenjang) => {
-                                              return (
-                                                <SelectItem
-                                                  value={jenjang}
-                                                  key={jenjang}
-                                                  className='uppercase'
-                                                >
-                                                  {jenjang.split('_').join(' ')}
-                                                </SelectItem>
-                                              );
-                                            })}
-                                          </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name={'ipk' + education}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>IPK</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            placeholder='Masukkan IPK'
-                                            type='number'
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name={'tgllulus' + education}
-                                    render={({ field }) => (
-                                      <FormItem className='flex flex-col'>
-                                        <FormLabel>Tanggal Lulus</FormLabel>
-                                        <Popover>
-                                          <PopoverTrigger asChild>
-                                            <FormControl>
-                                              <Button
-                                                variant='outline'
-                                                className={cn(
-                                                  'w-full pl-3 text-left font-normal',
-                                                  !field.value &&
-                                                    'text-muted-foreground',
-                                                )}
-                                              >
-                                                {field.value ? (
-                                                  format(
-                                                    field.value,
-                                                    'EEEE, dd MMMM yyyy',
-                                                  )
-                                                ) : (
-                                                  <span>
-                                                    Pilih Tanggal Lulus
-                                                  </span>
-                                                )}
-                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                              </Button>
-                                            </FormControl>
-                                          </PopoverTrigger>
-                                          <PopoverContent
-                                            className='w-full p-0'
-                                            align='start'
-                                          >
-                                            <Calendar
-                                              mode='single'
-                                              selected={field.value}
-                                              onSelect={field.onChange}
-                                              initialFocus
-                                            />
-                                          </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                </div>
-                              </AccordionContent>
-                            </AccordionItem>
-                            {educations.length > 1 && (
-                              <Button
-                                variant='destructive'
-                                type='button'
-                                onClick={() => {
-                                  setEducations(
-                                    educations.filter(
-                                      (edu) => edu !== education,
-                                    ),
-                                  );
-                                  resetField('universitas' + education);
-                                }}
-                              >
-                                Hapus
-                              </Button>
-                            )}
-                          </div>
-                        ))}
-                      </Accordion>
-                    </div>
-                    <Button
-                      type='button'
-                      className='w-full'
-                      onClick={() =>
-                        setEducations([
-                          ...educations,
-                          educations[educations.length - 1] + 1,
-                        ])
-                      }
-                    >
-                      Tambah Pendidikan
-                    </Button>
-                  </Step>
-                  <Step label={steps[2].label}>
-                    <div className='my-4 space-y-3'>
-                      <FormField
-                        control={form.control}
-                        name='status'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Status Lamaran</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value || ''}
-                            >
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='pelamar'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nama Pelamar</FormLabel>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder='Pilih Status' />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {EStatus.enumValues.map((status) => (
-                                  <SelectItem value={status} key={status}>
-                                    {status?.split('_').join(' ')}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='tgl_dikirim'
-                        render={({ field }) => (
-                          <FormItem className='flex flex-col'>
-                            <FormLabel>Tanggal Dikirim</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant='outline'
-                                    className={cn(
-                                      'w-full pl-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, 'EEEE, dd MMMM yyyy')
-                                    ) : (
-                                      <span>Pilih Tanggal Dikirim</span>
-                                    )}
-                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className='w-full p-0'
-                                align='start'
-                              >
-                                <Calendar
-                                  mode='single'
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  initialFocus
+                                <Input
+                                  placeholder='Masukkan Nama Pelamar'
+                                  {...field}
                                 />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='lampiran'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Lampiran</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Masukkan Lampiran'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name='keterangan'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Keterangan</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Masukkan Keterangan'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </Step>
-                  <Step label={steps[3].label}>
-                    <div className='my-4'>
-                      <FileUploaderMultiple
-                        pathFiles={pathFiles}
-                        setPathFiles={setPathFiles}
-                      />
-                    </div>
-                  </Step>
-                  <Footer onSubmit={onSubmit} isLoading={isPending} />
-                </Stepper>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='ttl'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Tempat, Tgl Lahir</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder='Masukkan Tempat, Tgl Lahir'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='no_hp'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>No. HP</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder='Masukkan No. HP'
+                                  type='number'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </Step>
+                    <Step label={steps[1].label}>
+                      <div className='my-4 space-y-3'>
+                        <Accordion type='single' collapsible className='w-full'>
+                          {educations.map((education, index) => (
+                            <div
+                              className='flex w-full items-start justify-between gap-3'
+                              key={index}
+                            >
+                              <AccordionItem
+                                value={index.toString()}
+                                className='w-full'
+                              >
+                                <AccordionTrigger>
+                                  Pendidikan ke {index + 1}
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <div className='w-full space-y-3 px-3'>
+                                    <FormField
+                                      control={form.control}
+                                      name={'universitas' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>
+                                            Universitas / Sekolah
+                                          </FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder='Masukkan Universitas / Sekolah'
+                                              {...field}
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name={'prodi' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Prodi / Jurusan</FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder='Masukkan Prodi / Jurusan'
+                                              {...field}
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name={'gelar' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Gelar</FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder='Masukkan Gelar'
+                                              {...field}
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name={'jenjang' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>
+                                            Jenjang Pendidikan
+                                          </FormLabel>
+                                          <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value || ''}
+                                          >
+                                            <FormControl>
+                                              <SelectTrigger>
+                                                <SelectValue placeholder='Pilih Jenjang Pendidikan' />
+                                              </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                              {(
+                                                Object.keys(EJenjang) as Array<
+                                                  keyof typeof EJenjang
+                                                >
+                                              ).map((jenjang) => {
+                                                return (
+                                                  <SelectItem
+                                                    value={jenjang}
+                                                    key={jenjang}
+                                                    className='uppercase'
+                                                  >
+                                                    {jenjang
+                                                      .split('_')
+                                                      .join(' ')}
+                                                  </SelectItem>
+                                                );
+                                              })}
+                                            </SelectContent>
+                                          </Select>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name={'ipk' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>IPK</FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder='Masukkan IPK'
+                                              type='number'
+                                              {...field}
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name={'tgllulus' + education}
+                                      render={({ field }) => (
+                                        <FormItem className='flex flex-col'>
+                                          <FormLabel>Tanggal Lulus</FormLabel>
+                                          <Popover>
+                                            <PopoverTrigger asChild>
+                                              <FormControl>
+                                                <Button
+                                                  variant='outline'
+                                                  className={cn(
+                                                    'w-full pl-3 text-left font-normal',
+                                                    !field.value &&
+                                                      'text-muted-foreground',
+                                                  )}
+                                                >
+                                                  {field.value ? (
+                                                    format(
+                                                      field.value,
+                                                      'EEEE, dd MMMM yyyy',
+                                                    )
+                                                  ) : (
+                                                    <span>
+                                                      Pilih Tanggal Lulus
+                                                    </span>
+                                                  )}
+                                                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                                </Button>
+                                              </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                              className='w-full p-0'
+                                              align='start'
+                                            >
+                                              <Calendar
+                                                mode='single'
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                initialFocus
+                                              />
+                                            </PopoverContent>
+                                          </Popover>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                              {educations.length > 1 && (
+                                <Button
+                                  variant='destructive'
+                                  type='button'
+                                  onClick={() => {
+                                    setEducations(
+                                      educations.filter(
+                                        (edu) => edu !== education,
+                                      ),
+                                    );
+                                    resetField('universitas' + education);
+                                  }}
+                                >
+                                  Hapus
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </Accordion>
+                      </div>
+                      <Button
+                        type='button'
+                        className='w-full'
+                        onClick={() =>
+                          setEducations([
+                            ...educations,
+                            educations[educations.length - 1] + 1,
+                          ])
+                        }
+                      >
+                        Tambah Pendidikan
+                      </Button>
+                    </Step>
+                    <Step label={steps[2].label}>
+                      <div className='my-4 space-y-3'>
+                        <FormField
+                          control={form.control}
+                          name='status'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Status Lamaran</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value || ''}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder='Pilih Status' />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {EStatus.enumValues.map((status) => (
+                                    <SelectItem value={status} key={status}>
+                                      {status?.split('_').join(' ')}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='tgl_dikirim'
+                          render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                              <FormLabel>Tanggal Dikirim</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant='outline'
+                                      className={cn(
+                                        'w-full pl-3 text-left font-normal',
+                                        !field.value && 'text-muted-foreground',
+                                      )}
+                                    >
+                                      {field.value ? (
+                                        format(
+                                          field.value,
+                                          'EEEE, dd MMMM yyyy',
+                                        )
+                                      ) : (
+                                        <span>Pilih Tanggal Dikirim</span>
+                                      )}
+                                      <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className='w-full p-0'
+                                  align='start'
+                                >
+                                  <Calendar
+                                    mode='single'
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='lampiran'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Lampiran</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Masukkan Lampiran'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='keterangan'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Keterangan</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Masukkan Keterangan'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </Step>
+                    <Step label={steps[3].label}>
+                      <div className='my-4 space-y-1'>
+                        <FileUploaderMultiple
+                          pathFiles={pathFiles}
+                          setPathFiles={setPathFiles}
+                        />
+                      </div>
+                    </Step>
+                    <Footer onSubmit={onSubmit} isLoading={isPending} />
+                  </Stepper>
+                </div>
               </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );

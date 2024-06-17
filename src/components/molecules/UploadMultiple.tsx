@@ -26,7 +26,6 @@ const FileUploaderMultiple = ({
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     multiple: true,
-    disabled: pathFiles.length > 0,
   });
   const renderFilePreview = (file: File) => {
     if (file.type.startsWith('image')) {
@@ -52,7 +51,7 @@ const FileUploaderMultiple = ({
   const fileList = files.map((file: File) => (
     <div
       key={file.name}
-      className=' my-6 flex justify-between rounded-md border px-3.5 py-3'
+      className='mb-6 flex justify-between rounded-md border px-3.5 py-3'
     >
       <div className='flex items-center space-x-3'>
         <div className='file-preview'>{renderFilePreview(file)}</div>
@@ -71,8 +70,24 @@ const FileUploaderMultiple = ({
       <Button
         variant='destructive'
         className='aspect-square rounded-full p-3'
-        disabled={pathFiles.length > 0}
         onClick={() => handleRemoveFile(file)}
+      >
+        <X className='h-10 w-10' />
+      </Button>
+    </div>
+  ));
+  const pathList = pathFiles.map((file, index) => (
+    <div
+      key={index}
+      className='mb-6 flex justify-between rounded-md border px-3.5 py-3'
+    >
+      <div className='text-sm text-card-foreground'>{file}</div>
+      <Button
+        variant='destructive'
+        className='aspect-square rounded-full p-3'
+        onClick={() =>
+          setPathFiles((prev) => prev.filter((_, i) => i !== index))
+        }
       >
         <X className='h-10 w-10' />
       </Button>
@@ -104,6 +119,7 @@ const FileUploaderMultiple = ({
         toast.dismiss();
         toast.success('Uploaded Berhasil');
       }
+      setFiles([]);
     } catch {
       toast.error('Upload Gagal');
     } finally {
@@ -112,9 +128,9 @@ const FileUploaderMultiple = ({
   }, [files, setPathFiles]);
 
   return (
-    <Fragment>
+    <div>
       <div {...getRootProps({ className: 'dropzone' })}>
-        <Input {...getInputProps()} disabled={pathFiles.length > 0} />
+        <Input {...getInputProps()} />
         <div className=' flex w-full flex-col items-center  rounded-md border border-dashed  py-[52px] text-center'>
           <div className='mb-3 inline-flex h-12 w-12 items-center justify-center rounded-md bg-muted'>
             <Upload className='text-default-500 h-6 w-6' />
@@ -124,8 +140,15 @@ const FileUploaderMultiple = ({
           </h4>
         </div>
       </div>
+      {pathFiles.length > 0 && (
+        <div className='mt-3'>
+          <h2>Sudah Di Upload</h2>
+          <div>{pathList}</div>
+        </div>
+      )}
       {files.length ? (
-        <Fragment>
+        <div className='mt-3'>
+          <h2>Belum Di Upload</h2>
           <div>{fileList}</div>
           <div className=' flex justify-end space-x-2'>
             <Button variant='destructive' onClick={handleRemoveAllFiles}>
@@ -133,15 +156,15 @@ const FileUploaderMultiple = ({
             </Button>
             <Button
               type='button'
-              disabled={isLoading || pathFiles.length > 0}
+              disabled={isLoading}
               onClick={handleUploadFiles}
             >
               Upload Files
             </Button>
           </div>
-        </Fragment>
+        </div>
       ) : null}
-    </Fragment>
+    </div>
   );
 };
 export default FileUploaderMultiple;
