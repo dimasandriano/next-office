@@ -60,13 +60,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
   const form = useForm({
     mode: 'onChange',
   });
-  const {
-    handleSubmit,
-    reset,
-    getValues,
-    setValue,
-    formState: { isDirty },
-  } = form;
+  const { handleSubmit, reset, getValues, setValue } = form;
 
   const { mutate: mutateCreateDisposisi, isPending: isPendingCreateDisposisi } =
     useMutation({
@@ -128,7 +122,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
     queryFn: () => divisiService.getAllDivisiSelection(),
-    enabled: openSelect,
+    enabled: open,
   });
   useEffect(() => {
     if (!isCreate && lamaran) {
@@ -302,11 +296,7 @@ export function DisposisiSheet({ lamaran }: TProps) {
             <div className='flex justify-end'>
               <Button
                 type='submit'
-                disabled={
-                  isPendingCreateDisposisi ||
-                  isPendingUpdateDisposisi ||
-                  !isDirty
-                }
+                disabled={isPendingCreateDisposisi || isPendingUpdateDisposisi}
               >
                 {isCreate ? 'Disposisikan' : 'Update Disposisi'}
               </Button>

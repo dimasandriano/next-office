@@ -163,12 +163,16 @@ export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
               {dataFiles?.map((data, index) => (
                 <Button
                   variant='outline'
-                  className='col-span-4 flex items-center gap-2'
+                  className='col-span-4'
                   key={index}
                   asChild
                 >
-                  <Link href={data} target='_blank'>
-                    <span className='truncate'>{files[index]}</span>
+                  <Link
+                    href={data}
+                    target='_blank'
+                    className='flex items-center gap-2'
+                  >
+                    <span className='w-10/12 truncate'>{files[index]}</span>
                     <SquareArrowOutUpRight />
                   </Link>
                 </Button>

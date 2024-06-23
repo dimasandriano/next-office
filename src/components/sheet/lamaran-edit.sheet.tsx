@@ -179,7 +179,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
         <ScrollArea className='h-[90vh] pr-5'>
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className='mt-5 flex flex-col justify-between'>
+              <div className='mt-5 flex flex-col justify-between px-2'>
                 <div className='flex w-full flex-col gap-4'>
                   <Stepper initialStep={0} steps={steps}>
                     <Step label={steps[0].label}>
