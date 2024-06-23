@@ -37,12 +37,12 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     images: [`${siteConfig.url}/images/og.jpg`],
-    creator: '@th_clarence',
+    creator: '@dimasandriano_h',
   },
   authors: [
     {
-      name: 'Theodorus Clarence',
-      url: 'https://theodorusclarence.com',
+      name: 'Dimas Andriano',
+      url: 'https://dimasandriano.is-a.dev',
     },
   ],
 };
@@ -62,6 +62,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
+
           <TanstackQueryProvider>{children}</TanstackQueryProvider>
         </ThemeProvider>
       </body>

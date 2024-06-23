@@ -23,7 +23,7 @@ export const suratService = {
     return data.data;
   },
 
-  createSurat: async (data: TSchemaSurat) => {
+  createSurat: async (data: Partial<TSchemaSurat>) => {
     const { data: response } = await instance.post('/surat/create', data);
     return response;
   },

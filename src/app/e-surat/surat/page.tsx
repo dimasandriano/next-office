@@ -2,7 +2,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { addDays, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import Link from 'next/link';
 import React, { useMemo } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useDebounce, useElementSize } from 'usehooks-ts';
@@ -12,6 +11,7 @@ import getNextPageParam from '@/hooks/getNextPageParam';
 
 import useSuratColumn from '@/components/columns/surat.column';
 import { TableVirtualized } from '@/components/molecules/TableVirtualized';
+import SuratCreateSheet from '@/components/sheet/surat-create.sheet';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -83,7 +83,6 @@ export default function Page() {
             <SelectContent>
               {tipe && <SelectItem value='all'>SEMUA</SelectItem>}
               {ETipe.enumValues.map((tipe) => {
-                if (tipe === 'lamaran') return;
                 return (
                   <SelectItem value={tipe} key={tipe} className='uppercase'>
                     {tipe.split('_').join(' ')}
@@ -143,9 +142,7 @@ export default function Page() {
             </PopoverContent>
           </Popover>
         </div>
-        <Button variant='default' asChild>
-          <Link href='/e-surat/surat/create'>Tambah Surat</Link>
-        </Button>
+        <SuratCreateSheet />
       </div>
       <div ref={tableContainerRef}>
         <TableVirtualized

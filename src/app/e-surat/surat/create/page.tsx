@@ -110,7 +110,6 @@ export default function Page() {
                       </FormControl>
                       <SelectContent>
                         {ETipe.enumValues.map((tipe) => {
-                          if (tipe === 'lamaran') return;
                           return (
                             <SelectItem
                               value={tipe}
