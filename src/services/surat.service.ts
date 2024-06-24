@@ -32,4 +32,12 @@ export const suratService = {
     const { data } = await instance.delete(`/surat/delete/${id}`);
     return data;
   },
+
+  updateSurat: async (data: Partial<TSchemaSurat>) => {
+    const { data: response } = await instance.put(
+      '/surat/edit/' + data.id,
+      data,
+    );
+    return response;
+  },
 };

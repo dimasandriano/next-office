@@ -1,16 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
-import { Eye, PenBox } from 'lucide-react';
-import Link from 'next/link';
 import React from 'react';
 
-import { hashid } from '@/lib/hashid';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
+import SuratDetailSheet from '@/components/sheet/surat-detail.sheet';
+import SuratEditSheet from '@/components/sheet/surat-edit.sheet';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 import { TSchemaSurat } from '@/types/surat.type';
 
@@ -70,9 +68,14 @@ export default function useSuratColumn(widthTableContainer: number) {
           sizeScale: 4,
         },
         cell: ({ row }) => {
-          return format(row.original.tgl_kegiatan, 'dd MMM yyyy HH:mm', {
-            locale: id,
-          });
+          return (
+            <div className='flex'>
+              {format(row.original.tgl_kegiatan, 'dd MMM yyyy', {
+                locale: id,
+              })}{' '}
+              {row.original.jam}
+            </div>
+          );
         },
       },
       {
@@ -111,16 +114,8 @@ export default function useSuratColumn(widthTableContainer: number) {
           return (
             <div>
               <div className='flex gap-2'>
-                <Button size='icon' variant='outline' asChild>
-                  <Link
-                    href={'/e-surat/surat/' + hashid.encode(row.original.id)}
-                  >
-                    <Eye />
-                  </Link>
-                </Button>
-                <Button size='icon' variant='default'>
-                  <PenBox />
-                </Button>
+                <SuratDetailSheet data={row.original} />
+                <SuratEditSheet data={row.original} />
                 <DeleteModal surat={row.original} />
               </div>
             </div>

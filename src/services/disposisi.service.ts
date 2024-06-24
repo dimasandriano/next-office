@@ -26,4 +26,9 @@ export const disposisiService = {
     const { data } = await instance.get('/disposisi/user/list', { params });
     return data;
   },
+
+  deleteDisposisi: async (id: string) => {
+    const { data } = await instance.delete(`/disposisi/delete/${id}`);
+    return data.data;
+  },
 };

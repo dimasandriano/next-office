@@ -44,7 +44,7 @@ export default function Page() {
 
   return (
     <div>
-      <h1 className='bg-gradient-to-r from-primary to-primary-foreground bg-clip-text pb-6 pt-4 text-center text-5xl font-bold text-transparent'>
+      <h1 className='bg-gradient-to-r from-primary to-primary-foreground bg-clip-text pb-6 pt-4 text-center text-5xl font-bold '>
         Surat & Lamaran Disposisi
       </h1>
       <div className='space-y-3'>

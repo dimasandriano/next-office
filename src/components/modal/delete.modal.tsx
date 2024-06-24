@@ -21,12 +21,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
+import { disposisiService } from '@/services/disposisi.service';
 import { divisiService } from '@/services/divisi.service';
 import { kategoriService } from '@/services/kategori.service';
 import { lamaranService } from '@/services/lamaran.service';
 import { suratService } from '@/services/surat.service';
 import { userService } from '@/services/user.service';
 
+import { TSchemaDisposisi } from '@/types/disposisi.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaLamaran } from '@/types/lamaran.type';
@@ -39,6 +41,8 @@ interface TDeleteModal {
   divisi?: TSchemaDivisi;
   users?: TSchemaUsers;
   lamaran?: TSchemaLamaran;
+  disposisi?: TSchemaDisposisi;
+  isDisposisi?: boolean;
 }
 
 /**
@@ -51,7 +55,10 @@ export function DeleteModal({
   divisi,
   users,
   lamaran,
+  disposisi,
+  isDisposisi = false,
 }: TDeleteModal) {
+  const [open, setOpen] = useState(false);
   const { mutate: deleteSurat } = useMutation({
     mutationKey: ['delete-surat'],
     mutationFn: (id: string) => suratService.deleteSurat(id),
@@ -107,6 +114,19 @@ export function DeleteModal({
       toast.error('Hapus Lamaran Gagal');
     },
   });
+  const { mutate: deleteDisposisi } = useMutation({
+    mutationKey: ['delete-disposisi'],
+    mutationFn: (id: string) => disposisiService.deleteDisposisi(id),
+    onSuccess: () => {
+      toast.success('Hapus Disposisi Berhasil');
+      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['lamaran'] });
+      queryClient.invalidateQueries({ queryKey: ['surat'] });
+    },
+    onError: () => {
+      toast.error('Hapus Disposisi Gagal');
+    },
+  });
   const handleDelete = useCallback(
     (id: string) => {
       if (surat) {
@@ -129,6 +149,10 @@ export function DeleteModal({
         deleteLamaran(id);
         return;
       }
+      if (disposisi) {
+        deleteDisposisi(id);
+        return;
+      }
     },
     [
       deleteDivisi,
@@ -136,11 +160,13 @@ export function DeleteModal({
       deleteLamaran,
       deleteSurat,
       deleteUser,
+      deleteDisposisi,
       divisi,
       kategori,
       lamaran,
       surat,
       users,
+      disposisi,
     ],
   );
   const [valueConfirm, setValueConfirm] = useState<string>('');
@@ -161,13 +187,29 @@ export function DeleteModal({
     if (lamaran) {
       return lamaran.pelamar === valueConfirm;
     }
-  }, [divisi, kategori, lamaran, surat, users, valueConfirm]);
+    if (disposisi) {
+      return 'Hapus Disposisi' === valueConfirm;
+    }
+  }, [disposisi, divisi, kategori, lamaran, surat, users, valueConfirm]);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size='icon' variant='destructive'>
-          <TrashIcon />
-        </Button>
+        <div>
+          {disposisi && (
+            <Button
+              size={disposisi && 'default'}
+              variant='destructive'
+              type='button'
+            >
+              {disposisi && 'Hapus Disposisi'}
+            </Button>
+          )}
+          {!isDisposisi && (
+            <Button size='icon' variant='destructive' type='button'>
+              <TrashIcon />
+            </Button>
+          )}
+        </div>
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
@@ -178,13 +220,15 @@ export function DeleteModal({
           <DialogDescription>
             Apakah anda yakin ingin menghapus {surat && 'surat'}{' '}
             {kategori && 'kategori'} {divisi && 'divisi'} {users && 'pengguna'}{' '}
-            {lamaran && 'lamaran'} ini? <br />
+            {lamaran && 'lamaran'}
+            {disposisi && 'disposisi'} ini? <br />
             <span className='block text-center text-lg font-semibold text-red-400'>
               {surat && surat.no_surat}
               {kategori && kategori.nama}
               {divisi && divisi.nama}
               {users && users.username}
               {lamaran && lamaran.pelamar}
+              {disposisi && 'Hapus Disposisi'}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -215,6 +259,9 @@ export function DeleteModal({
                 }
                 if (lamaran) {
                   handleDelete(hashid.encode(lamaran?.id as number));
+                }
+                if (disposisi) {
+                  handleDelete(hashid.encode(disposisi?.id as number));
                 }
               }}
             >

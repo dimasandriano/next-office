@@ -2,11 +2,13 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format, isDate } from 'date-fns';
-import { CalendarIcon, Plus } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { isArray } from 'lodash';
+import { CalendarIcon, PenBox } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FieldValues, useForm, UseFormReset } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
+import { isJsonString } from '@/lib/isjson';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +64,7 @@ import { suratService } from '@/services/surat.service';
 import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaSurat } from '@/types/surat.type';
 
-export default function SuratCreateSheet() {
+export default function SuratEditSheet({ data }: { data: TSchemaSurat }) {
   const [open, setOpen] = useState(false);
   const steps = [
     { label: 'Jenis Surat' },
@@ -73,34 +75,64 @@ export default function SuratCreateSheet() {
   const form = useForm({
     mode: 'all',
   });
-
-  const { watch } = form;
-  const { handleSubmit, reset, getValues } = form;
+  const files = useMemo(() => {
+    return isJsonString(data.files || '') ? JSON.parse(data.files || '{}') : [];
+  }, [data?.files]);
+  const { handleSubmit, reset, watch, setValue, getValues } = form;
   const [pathFiles, setPathFiles] = useState<string[]>([]);
 
-  const { mutate: mutateCreateSurat, isPending } = useMutation({
-    mutationKey: ['create-surat'],
-    mutationFn: (data: Partial<TSchemaSurat>) => suratService.createSurat(data),
+  useEffect(() => {
+    if (open) {
+      setValue('tipe', data.tipe);
+      setValue('no_surat', data.no_surat);
+      setValue('sifat', data.sifat);
+      setValue('status', data.status);
+      setValue('tgl_dikirim', data.tgl_dikirim);
+      setValue('tgl_diterima', data.tgl_diterima);
+      setValue('tgl_kegiatan', data.tgl_kegiatan);
+      setValue('tgl_masuk', new Date(data.tgl_masuk));
+      setValue(
+        'jam',
+        new Date(format(new Date(), 'yyyy-MM-dd') + ' ' + data.jam),
+      );
+      setValue('isi', data.isi);
+      setValue('keterangan', data.keterangan);
+      setValue('pengirim', data.pengirim);
+      setValue('peminta', data.peminta);
+      setValue('ditujukan', data.ditujukan);
+      setValue('perihal', data.perihal);
+      setValue('nama_kegiatan', data.nama_kegiatan);
+      setValue('tempat', data.tempat);
+      setValue('kategori_id', String(data.kategori_id));
+      if (isArray(files)) {
+        setPathFiles(files.map((item) => item));
+      }
+    }
+  }, [data, setValue, open, files]);
+  const { mutate: mutateUpdateSurat, isPending } = useMutation({
+    mutationKey: ['update-surat'],
+    mutationFn: (data: Partial<TSchemaSurat>) => suratService.updateSurat(data),
     onSuccess: () => {
-      toast.success('Surat Berhasil Dibuat');
+      toast.success('Surat Berhasil Diupdate');
       reset();
       setPathFiles([]);
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['surat'] });
     },
-    onError: () => toast.error('Surat Gagal Dibuat'),
+    onError: () => toast.error('Surat Gagal Diupdate'),
   });
   const onSubmit = useCallback(() => {
-    mutateCreateSurat({
+    mutateUpdateSurat({
       ...getValues(),
+      id: data.id,
       kategori_id: Number(watch('kategori_id')),
       jam: isDate(watch('jam')) ? format(watch('jam'), 'HH:mm') : undefined,
-      files: JSON.stringify(pathFiles),
+      files: pathFiles.length > 0 ? JSON.stringify(pathFiles) : undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     getValues,
-    mutateCreateSurat,
+    mutateUpdateSurat,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     watch('jam'),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,16 +148,13 @@ export default function SuratCreateSheet() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button>
-          <span className='mr-1 text-xl'>
-            <Plus />
-          </span>
-          Tambah Surat
+        <Button size='icon' variant='default'>
+          <PenBox />
         </Button>
       </SheetTrigger>
       <SheetContent className='min-w-[50%]'>
         <SheetHeader>
-          <SheetTitle>Tambah Surat</SheetTitle>
+          <SheetTitle>Edit Surat {data?.no_surat}</SheetTitle>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
