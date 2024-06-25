@@ -6,6 +6,7 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
+import { EditModalPasswordUser } from '@/components/modal/editpassworduser.modal';
 import { EditModalUser } from '@/components/modal/edituser.modal';
 import { Badge } from '@/components/ui/badge';
 
@@ -106,12 +107,13 @@ export default function useUserColumn(widthTableContainer: number) {
         id: 'aksi',
         header: 'Aksi',
         meta: {
-          sizeScale: 2,
+          sizeScale: 3,
         },
         cell: ({ row }) => {
           return (
             <div>
               <div className='flex gap-2'>
+                <EditModalPasswordUser users={row.original} />
                 <EditModalUser users={row.original} />
                 <DeleteModal users={row.original} />
               </div>

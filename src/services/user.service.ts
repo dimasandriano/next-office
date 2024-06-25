@@ -1,7 +1,7 @@
 import instance from '@/lib/axios/instance';
 
 import { TParams } from '@/types/params.type';
-import { TSchemaUsers } from '@/types/users.type';
+import { TChangePasswordUser, TSchemaUsers } from '@/types/users.type';
 
 export const userService = {
   getAllUser: async (params: TParams) => {
@@ -23,6 +23,14 @@ export const userService = {
 
   updateUser: async (data: Partial<TSchemaUsers>) => {
     const { data: result } = await instance.put(`/users/edit/${data.id}`, data);
+    return result.data;
+  },
+
+  changePasswordUser: async (data: TChangePasswordUser) => {
+    const { data: result } = await instance.put(
+      `/users/change-password/${data.id}`,
+      data,
+    );
     return result.data;
   },
 };

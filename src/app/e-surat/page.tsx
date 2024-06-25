@@ -2,7 +2,17 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { addDays, format } from 'date-fns';
-import { CalendarIcon, DollarSign } from 'lucide-react';
+import {
+  CalendarIcon,
+  MailMinus,
+  MailPlus,
+  MailQuestion,
+  ScrollText,
+  SquareStack,
+  Users,
+  Waypoints,
+} from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -85,67 +95,81 @@ export default function Page() {
       </div>
       <div className='grid grid-cols-12 gap-5'>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Surat Masuk</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.suratMasuk}</h2>
-          </CardHeader>
+          <Link href='/e-surat/surat'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Surat Masuk</h3>
+                <MailPlus />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.suratMasuk}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Surat Keluar</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.suratKeluar}</h2>
-          </CardHeader>
+          <Link href='/e-surat/surat'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Surat Keluar</h3>
+                <MailMinus />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.suratKeluar}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Surat External</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.suratExternal}</h2>
-          </CardHeader>
+          <Link href='/e-surat/surat'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Surat External</h3>
+                <MailQuestion />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.suratExternal}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Divisi</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.divisi}</h2>
-          </CardHeader>
+          <Link href='/e-surat/divisi'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Divisi</h3>
+                <Waypoints />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.divisi}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Kategori</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.kategori}</h2>
-          </CardHeader>
+          <Link href='/e-surat/kategori'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Kategori</h3>
+                <SquareStack />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.kategori}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Lamaran</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.lamaran}</h2>
-          </CardHeader>
+          <Link href='/e-surat/lamaran'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>Lamaran</h3>
+                <ScrollText />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.lamaran}</h2>
+            </CardHeader>
+          </Link>
         </Card>
         <Card className='col-span-4'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>User</h3>
-              <DollarSign />
-            </div>
-            <h2 className='text-4xl font-bold'>{data?.user}</h2>
-          </CardHeader>
+          <Link href='/e-surat/users'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-lg font-semibold'>User</h3>
+                <Users />
+              </div>
+              <h2 className='text-4xl font-bold'>{data?.user}</h2>
+            </CardHeader>
+          </Link>
         </Card>
       </div>
     </div>

@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
     with: {
       division: true,
     },
+    columns: {
+      password: false,
+    },
   });
 
   const counts = await db

@@ -12,7 +12,6 @@ import toast from 'react-hot-toast';
 import { ZloginSchema } from '@/lib/zod/auth.schemaZod';
 
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -22,7 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 
 import { authService } from '@/services/auth.service';
 
@@ -30,7 +29,6 @@ import { TLogin } from '@/types/auth.type';
 
 export default function Page() {
   const router = useRouter();
-  const [isShowPassword, setIsShowPassword] = React.useState(false);
   const form = useForm<TLogin>({
     resolver: zodResolver(ZloginSchema),
   });
@@ -78,30 +76,12 @@ export default function Page() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder='Masukkan password'
-                    {...field}
-                    type={isShowPassword ? 'text' : 'password'}
-                  />
+                  <PasswordInput placeholder='Masukkan password' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className='flex justify-end'>
-            <div className='flex items-center space-x-2'>
-              <Checkbox
-                id='pw'
-                onClick={() => setIsShowPassword(!isShowPassword)}
-              />
-              <Label
-                htmlFor='pw'
-                className='cursor-pointer text-sm font-normal'
-              >
-                Tampilkan Password
-              </Label>
-            </div>
-          </div>
           <Button type='submit' className='w-full' disabled={isPending}>
             {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             {isPending ? 'Login...' : 'Login'}
