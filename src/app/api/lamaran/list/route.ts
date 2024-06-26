@@ -25,7 +25,11 @@ export async function GET(request: NextRequest) {
     limit: Number(take),
     offset: (Number(page) - 1) * Number(take),
     with: {
-      disposisi: true,
+      disposisi: {
+        with: {
+          divisi: true,
+        },
+      },
     },
     orderBy: (lamaran, { desc }) => [desc(lamaran.tgl)],
   });

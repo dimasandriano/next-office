@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useDebounce, useElementSize } from 'usehooks-ts';
 
+import { KategoriSchemaZod } from '@/lib/zod/kategori.schemaZod';
 import getNextPageParam from '@/hooks/getNextPageParam';
 
 import useKategoriColumn from '@/components/columns/kategori.column';
@@ -63,19 +65,33 @@ export default function Page() {
 
   const form = useForm<TSchemaKategori>({
     mode: 'all',
+    resolver: zodResolver(KategoriSchemaZod),
   });
-  const { mutate: mutateCreateKategori } = useMutation({
-    mutationKey: ['create-kategori'],
-    mutationFn: (data: TSchemaKategori) => kategoriService.createKategori(data),
-    onSuccess: () => {
-      toast.success('Kategori Berhasil');
-      refetch();
-    },
-    onError: () => {
-      toast.error('Kategori Gagal');
-    },
-  });
-
+  const {
+    reset,
+    formState: { errors },
+    clearErrors,
+  } = form;
+  const { mutate: mutateCreateKategori, isPending: isPendingCreate } =
+    useMutation({
+      mutationKey: ['create-kategori'],
+      mutationFn: (data: TSchemaKategori) =>
+        kategoriService.createKategori(data),
+      onSuccess: () => {
+        toast.success('Kategori Berhasil');
+        refetch();
+        setShowCreateModal(false);
+        reset();
+      },
+      onError: () => {
+        toast.error('Kategori Gagal');
+      },
+    });
+  useEffect(() => {
+    clearErrors();
+    reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearErrors, showCreateModal]);
   const column = useKategoriColumn(widthTableContainer || 0);
   return (
     <div>
@@ -158,11 +174,18 @@ export default function Page() {
                     Close
                   </Button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <Button type='submit' variant='default' className='flex-1'>
-                    Simpan
-                  </Button>
-                </DialogClose>
+                <Button
+                  type='submit'
+                  variant='default'
+                  className='flex-1'
+                  disabled={
+                    errors.nama || errors.keterangan || isPendingCreate
+                      ? true
+                      : false
+                  }
+                >
+                  Simpan
+                </Button>
               </DialogFooter>
             </form>
           </Form>

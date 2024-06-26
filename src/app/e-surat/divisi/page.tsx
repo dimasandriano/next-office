@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useDebounce, useElementSize } from 'usehooks-ts';
 
+import { DivisiSchemaZod } from '@/lib/zod/divisi.schemaZod';
 import getNextPageParam from '@/hooks/getNextPageParam';
 
 import useDivisiColumn from '@/components/columns/divisi.column';
@@ -63,19 +65,40 @@ export default function Page() {
 
   const form = useForm<TSchemaDivisi>({
     mode: 'all',
-  });
-  const { mutate: mutateCreateDivisi } = useMutation({
-    mutationKey: ['create-divisi'],
-    mutationFn: (data: TSchemaDivisi) => divisiService.createDivisi(data),
-    onSuccess: () => {
-      toast.success('Divisi Berhasil Bertambah');
-      refetch();
-    },
-    onError: () => {
-      toast.error('Divisi Gagal Bertambah');
-    },
+    resolver: zodResolver(DivisiSchemaZod),
   });
 
+  const {
+    reset,
+    formState: { errors },
+    clearErrors,
+  } = form;
+  const { mutate: mutateCreateDivisi, isPending: isPendingCreate } =
+    useMutation({
+      mutationKey: ['create-divisi'],
+      mutationFn: (data: TSchemaDivisi) => divisiService.createDivisi(data),
+      onSuccess: () => {
+        toast.success('Divisi Berhasil Bertambah');
+        reset();
+        refetch();
+        setShowCreateModal(false);
+      },
+      onError: () => {
+        toast.error('Divisi Gagal Bertambah');
+      },
+    });
+
+  const handleCreateDivisi = useCallback(
+    (data: TSchemaDivisi) => {
+      mutateCreateDivisi(data);
+    },
+    [mutateCreateDivisi],
+  );
+  useEffect(() => {
+    clearErrors();
+    reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearErrors, showCreateModal]);
   const column = useDivisiColumn(widthTableContainer || 0);
   return (
     <div>
@@ -116,7 +139,7 @@ export default function Page() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(() =>
-                mutateCreateDivisi(form.getValues()),
+                handleCreateDivisi(form.getValues()),
               )}
               className='space-y-3'
             >
@@ -158,11 +181,18 @@ export default function Page() {
                     Close
                   </Button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <Button type='submit' variant='default' className='flex-1'>
-                    Simpan
-                  </Button>
-                </DialogClose>
+                <Button
+                  type='submit'
+                  variant='default'
+                  className='flex-1'
+                  disabled={
+                    errors.nama || errors.keterangan || isPendingCreate
+                      ? true
+                      : false
+                  }
+                >
+                  Simpan
+                </Button>
               </DialogFooter>
             </form>
           </Form>

@@ -164,6 +164,7 @@ export function TableVirtualized<TData, TValue>({
                     position: 'absolute',
                     display: 'flex',
                     width: tbodyRef?.current?.offsetWidth ?? 0,
+                    alignItems: 'center',
                   }}
                 >
                   {row.getVisibleCells().map((cell, cellIndex) => (

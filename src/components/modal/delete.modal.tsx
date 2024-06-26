@@ -2,7 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { TrashIcon } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { hashid } from '@/lib/hashid';
@@ -191,6 +191,12 @@ export function DeleteModal({
       return 'Hapus Disposisi' === valueConfirm;
     }
   }, [disposisi, divisi, kategori, lamaran, surat, users, valueConfirm]);
+
+  useEffect(() => {
+    if (!open) {
+      setValueConfirm('');
+    }
+  }, [open]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

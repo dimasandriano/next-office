@@ -98,7 +98,7 @@ export default function Page() {
           <Link href='/e-surat/surat'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Surat Masuk</h3>
+                <h1 className='text-lg font-semibold'>Surat Masuk</h1>
                 <MailPlus />
               </div>
               <h2 className='text-4xl font-bold'>{data?.suratMasuk}</h2>
@@ -109,7 +109,7 @@ export default function Page() {
           <Link href='/e-surat/surat'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Surat Keluar</h3>
+                <h1 className='text-lg font-semibold'>Surat Keluar</h1>
                 <MailMinus />
               </div>
               <h2 className='text-4xl font-bold'>{data?.suratKeluar}</h2>
@@ -120,7 +120,7 @@ export default function Page() {
           <Link href='/e-surat/surat'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Surat External</h3>
+                <h1 className='text-lg font-semibold'>Surat External</h1>
                 <MailQuestion />
               </div>
               <h2 className='text-4xl font-bold'>{data?.suratExternal}</h2>
@@ -131,7 +131,7 @@ export default function Page() {
           <Link href='/e-surat/divisi'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Divisi</h3>
+                <h1 className='text-lg font-semibold'>Divisi</h1>
                 <Waypoints />
               </div>
               <h2 className='text-4xl font-bold'>{data?.divisi}</h2>
@@ -142,7 +142,7 @@ export default function Page() {
           <Link href='/e-surat/kategori'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Kategori</h3>
+                <h1 className='text-lg font-semibold'>Kategori</h1>
                 <SquareStack />
               </div>
               <h2 className='text-4xl font-bold'>{data?.kategori}</h2>
@@ -153,7 +153,7 @@ export default function Page() {
           <Link href='/e-surat/lamaran'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>Lamaran</h3>
+                <h1 className='text-lg font-semibold'>Lamaran</h1>
                 <ScrollText />
               </div>
               <h2 className='text-4xl font-bold'>{data?.lamaran}</h2>
@@ -164,7 +164,7 @@ export default function Page() {
           <Link href='/e-surat/users'>
             <CardHeader>
               <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-semibold'>User</h3>
+                <h1 className='text-lg font-semibold'>User</h1>
                 <Users />
               </div>
               <h2 className='text-4xl font-bold'>{data?.user}</h2>

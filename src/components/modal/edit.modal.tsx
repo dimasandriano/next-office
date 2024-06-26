@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { PenBox } from 'lucide-react';
 import React from 'react';
@@ -8,6 +9,8 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import queryClient from '@/lib/tanstack';
+import { DivisiSchemaZod } from '@/lib/zod/divisi.schemaZod';
+import { KategoriSchemaZod } from '@/lib/zod/kategori.schemaZod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -46,10 +49,14 @@ interface TEditModal {
  * <EditModal surat={row.original} />
  */
 export function EditModal({ kategori, divisi }: TEditModal) {
+  const [open, setOpen] = React.useState(false);
   const form = useForm<TSchemaKategori | TSchemaDivisi>({
     mode: 'all',
+    resolver: zodResolver(kategori ? KategoriSchemaZod : DivisiSchemaZod),
   });
-
+  const {
+    formState: { errors },
+  } = form;
   React.useEffect(() => {
     form.reset(kategori);
     form.reset(divisi);
@@ -65,25 +72,27 @@ export function EditModal({ kategori, divisi }: TEditModal) {
     }
   }, [divisi, form, kategori]);
 
-  const { mutate: updateKategori } = useMutation({
+  const { mutate: updateKategori, isPending: isLoadingKategori } = useMutation({
     mutationKey: ['update-surat'],
     mutationFn: (data: Partial<TSchemaKategori>) =>
       kategoriService.updateKategori(data),
     onSuccess: () => {
       toast.success('Edit Kategori Berhasil');
       queryClient.invalidateQueries({ queryKey: ['kategori'] });
+      setOpen(false);
     },
     onError: () => {
       toast.error('Edit Kategori Gagal');
     },
   });
-  const { mutate: updateDivisi } = useMutation({
+  const { mutate: updateDivisi, isPending: isLoadingDivisi } = useMutation({
     mutationKey: ['update-divisi'],
     mutationFn: (data: Partial<TSchemaDivisi>) =>
       divisiService.updateDivisi(data),
     onSuccess: () => {
       toast.success('Edit Divisi Berhasil');
       queryClient.invalidateQueries({ queryKey: ['divisi'] });
+      setOpen(false);
     },
     onError: () => {
       toast.error('Edit Divisi Gagal');
@@ -112,7 +121,7 @@ export function EditModal({ kategori, divisi }: TEditModal) {
     [divisi, kategori, updateDivisi, updateKategori],
   );
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size='icon' variant='default'>
           <PenBox />
@@ -176,11 +185,21 @@ export function EditModal({ kategori, divisi }: TEditModal) {
                   Close
                 </Button>
               </DialogClose>
-              <DialogClose asChild>
-                <Button type='submit' variant='default' className='flex-1'>
-                  Update
-                </Button>
-              </DialogClose>
+              <Button
+                type='submit'
+                variant='default'
+                className='flex-1'
+                disabled={
+                  errors.nama ||
+                  errors.keterangan ||
+                  isLoadingKategori ||
+                  isLoadingDivisi
+                    ? true
+                    : false
+                }
+              >
+                Update
+              </Button>
             </DialogFooter>
           </form>
         </Form>

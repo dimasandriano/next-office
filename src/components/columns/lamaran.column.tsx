@@ -6,6 +6,7 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
+import DisposisiCetakModal from '@/components/modal/disposisi-cetak.modal';
 import { DisposisiSheet } from '@/components/sheet/disposisi.sheet';
 import LamaranDetailSheet from '@/components/sheet/lamaran-detail.sheet';
 import LamaranEditSheet from '@/components/sheet/lamaran-edit.sheet';
@@ -89,7 +90,14 @@ export default function useLamaranColumn(widthTableContainer: number) {
           sizeScale: 4,
         },
         cell: ({ row }) => {
-          return <DisposisiSheet lamaran={row.original} />;
+          return (
+            <div className='flex items-center gap-2'>
+              <DisposisiSheet lamaran={row.original} />
+              {row.original.disposisi && (
+                <DisposisiCetakModal data={row.original} />
+              )}
+            </div>
+          );
         },
       },
       {
