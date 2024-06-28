@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
@@ -20,7 +21,8 @@ const loginSchema = z.object({
 export async function POST(request: Request) {
   const body = await request.json();
   const result = loginSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const { username, password } = result.data;
 
   const user = await db

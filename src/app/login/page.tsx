@@ -2,13 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import { ZloginSchema } from '@/lib/zod/auth.schemaZod';
 
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { authService } from '@/services/auth.service';
 
 import { TLogin } from '@/types/auth.type';
+import { AxiosResError } from '@/types/axios-res-error.type';
 
 export default function Page() {
   const router = useRouter();
@@ -36,7 +39,8 @@ export default function Page() {
   const { mutate, isPending } = useMutation({
     mutationKey: ['login'],
     mutationFn: async (data: TLogin) => await authService.authLogin(data),
-    onError: () => toast.error('Login failed'),
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Login', error),
     onSuccess: ({ data }) => {
       toast.success('Login success');
       Cookies.set('token', data?.token, {

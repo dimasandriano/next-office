@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import * as React from 'react';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 
 import '@/styles/globals.css';
 
@@ -61,8 +61,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster />
-
+          <Toaster richColors position='bottom-right' />
           <TanstackQueryProvider>{children}</TanstackQueryProvider>
         </ThemeProvider>
       </body>

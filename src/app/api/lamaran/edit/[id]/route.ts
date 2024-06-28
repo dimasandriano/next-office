@@ -2,10 +2,11 @@ import { eq } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { lamaran } from '@/lib/drizzle/schema/lamaran.schema';
-import { UnauthorizedError } from '@/lib/exceptions';
+import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaLamaran } from '@/types/lamaran.type';
@@ -35,15 +36,8 @@ export async function PUT(
   }
   const body: TSchemaLamaran = await request.json();
   const result = editSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const {
     tgl,
     pelamar,

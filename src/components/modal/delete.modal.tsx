@@ -1,11 +1,13 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { TrashIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { hashid } from '@/lib/hashid';
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 
 import { Button } from '@/components/ui/button';
@@ -28,6 +30,7 @@ import { lamaranService } from '@/services/lamaran.service';
 import { suratService } from '@/services/surat.service';
 import { userService } from '@/services/user.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDisposisi } from '@/types/disposisi.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaKategori } from '@/types/kategori.type';
@@ -66,9 +69,8 @@ export function DeleteModal({
       toast.success('Hapus Surat Berhasil');
       queryClient.invalidateQueries({ queryKey: ['surat'] });
     },
-    onError: () => {
-      toast.error('Hapus Surat Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Surat Gagal', error),
   });
   const { mutate: deleteKategori } = useMutation({
     mutationKey: ['delete-kategori'],
@@ -77,9 +79,8 @@ export function DeleteModal({
       toast.success('Hapus Kategori Berhasil');
       queryClient.invalidateQueries({ queryKey: ['kategori'] });
     },
-    onError: () => {
-      toast.error('Hapus Kategori Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Kategori Gagal', error),
   });
   const { mutate: deleteDivisi } = useMutation({
     mutationKey: ['delete-divisi'],
@@ -88,9 +89,8 @@ export function DeleteModal({
       toast.success('Hapus Divisi Berhasil');
       queryClient.invalidateQueries({ queryKey: ['divisi'] });
     },
-    onError: () => {
-      toast.error('Hapus Divisi Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Divisi Gagal', error),
   });
   const { mutate: deleteUser } = useMutation({
     mutationKey: ['delete-user'],
@@ -99,9 +99,8 @@ export function DeleteModal({
       toast.success('Hapus Pengguna Berhasil');
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
-    onError: () => {
-      toast.error('Hapus Pengguna Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Pengguna Gagal', error),
   });
   const { mutate: deleteLamaran } = useMutation({
     mutationKey: ['delete-lamaran'],
@@ -110,9 +109,8 @@ export function DeleteModal({
       toast.success('Hapus Lamaran Berhasil');
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
     },
-    onError: () => {
-      toast.error('Hapus Lamaran Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Lamaran Gagal', error),
   });
   const { mutate: deleteDisposisi } = useMutation({
     mutationKey: ['delete-disposisi'],
@@ -123,9 +121,8 @@ export function DeleteModal({
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
       queryClient.invalidateQueries({ queryKey: ['surat'] });
     },
-    onError: () => {
-      toast.error('Hapus Disposisi Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Hapus Disposisi Gagal', error),
   });
   const handleDelete = useCallback(
     (id: string) => {

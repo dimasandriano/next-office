@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import { cn } from '@/lib/utils';
 
 import Breadcrumb from '@/components/molecules/Breadcrumb';
@@ -41,6 +43,7 @@ import { ETipe } from '@/enums/tipe.enum';
 import { kategoriService } from '@/services/kategori.service';
 import { suratService } from '@/services/surat.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaSurat } from '@/types/surat.type';
 
@@ -68,7 +71,8 @@ export default function Page() {
       reset();
       resetField('sifat');
     },
-    onError: () => toast.error('Failed to create surat'),
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Membuat Surat', error),
   });
 
   const onSubmit = useCallback(

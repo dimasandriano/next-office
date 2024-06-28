@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {

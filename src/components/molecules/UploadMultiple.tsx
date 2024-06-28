@@ -4,8 +4,8 @@ import { Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { Fragment, useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import toast from 'react-hot-toast';
 import { IconBase } from 'react-icons';
+import { toast } from 'sonner';
 
 import { supabase } from '@/lib/supabase';
 
@@ -23,9 +23,17 @@ const FileUploaderMultiple = ({
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
+      if (acceptedFiles.some((file: File) => file.size > 5000000)) {
+        toast.error('File terlalu besar');
+        return;
+      }
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     multiple: true,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png'],
+      'application/pdf': ['.pdf'],
+    },
   });
   const renderFilePreview = (file: File) => {
     if (file.type.startsWith('image')) {

@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
@@ -31,7 +32,8 @@ export async function PUT(
   if (!cekId) return NotFoundError('Data disposisi tidak ditemukan');
   const body: TSchemaDisposisi = await request.json();
   const result = editSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const {
     isi,
     note_pengirim,

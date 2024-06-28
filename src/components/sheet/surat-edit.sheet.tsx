@@ -1,14 +1,16 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format, isDate } from 'date-fns';
 import { isArray } from 'lodash';
 import { CalendarIcon, PenBox } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FieldValues, useForm, UseFormReset } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { isJsonString } from '@/lib/isjson';
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -61,6 +63,7 @@ import { ETipe } from '@/enums/tipe.enum';
 import { kategoriService } from '@/services/kategori.service';
 import { suratService } from '@/services/surat.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 import { TSchemaSurat } from '@/types/surat.type';
 
@@ -119,7 +122,8 @@ export default function SuratEditSheet({ data }: { data: TSchemaSurat }) {
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['surat'] });
     },
-    onError: () => toast.error('Surat Gagal Diupdate'),
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Mengupdate Surat', error),
   });
   const onSubmit = useCallback(() => {
     mutateUpdateSurat({

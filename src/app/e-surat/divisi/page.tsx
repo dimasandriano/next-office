@@ -3,11 +3,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useDebounce, useElementSize } from 'usehooks-ts';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import { DivisiSchemaZod } from '@/lib/zod/divisi.schemaZod';
 import getNextPageParam from '@/hooks/getNextPageParam';
 
@@ -35,6 +37,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { divisiService } from '@/services/divisi.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 
 export default function Page() {
@@ -83,9 +86,8 @@ export default function Page() {
         refetch();
         setShowCreateModal(false);
       },
-      onError: () => {
-        toast.error('Divisi Gagal Bertambah');
-      },
+      onError: (error: AxiosError<AxiosResError>) =>
+        toastError('Divisi Gagal Ditambah', error),
     });
 
   const handleCreateDivisi = useCallback(

@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
@@ -21,7 +22,8 @@ export async function POST(request: NextRequest) {
   const { username } = useDecodedTokenJWT(request);
   const body: TSchemaDisposisi = await request.json();
   const result = createSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const {
     isi,
     note_pengirim,

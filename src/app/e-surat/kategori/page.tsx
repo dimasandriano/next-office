@@ -3,11 +3,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useDebounce, useElementSize } from 'usehooks-ts';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import { KategoriSchemaZod } from '@/lib/zod/kategori.schemaZod';
 import getNextPageParam from '@/hooks/getNextPageParam';
 
@@ -35,6 +37,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { kategoriService } from '@/services/kategori.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 
 export default function Page() {
@@ -83,9 +86,8 @@ export default function Page() {
         setShowCreateModal(false);
         reset();
       },
-      onError: () => {
-        toast.error('Kategori Gagal');
-      },
+      onError: (error: AxiosError<AxiosResError>) =>
+        toastError('Gagal Membuat Kategori', error),
     });
   useEffect(() => {
     clearErrors();

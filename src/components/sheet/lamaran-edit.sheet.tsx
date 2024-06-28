@@ -1,14 +1,16 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import _, { isArray } from 'lodash';
 import { CalendarIcon, PenBox } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import { isJsonString } from '@/lib/isjson';
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -62,6 +64,7 @@ import { EJenjang } from '@/enums/jenjang.enum';
 import { EStatus } from '@/enums/status.enum';
 import { lamaranService } from '@/services/lamaran.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaLamaran } from '@/types/lamaran.type';
 
 export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
@@ -101,7 +104,8 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
     },
-    onError: () => toast.error('Lamaran Gagal Diubah'),
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Mengubah Lamaran', error),
   });
 
   useEffect(() => {

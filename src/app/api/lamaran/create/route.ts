@@ -1,10 +1,11 @@
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { lamaran } from '@/lib/drizzle/schema/lamaran.schema';
-import { UnauthorizedError } from '@/lib/exceptions';
+import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 import useDecodedTokenJWT from '@/hooks/useDecodedTokenJWT';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
@@ -21,15 +22,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { username: created_by } = useDecodedTokenJWT(request);
   const result = createSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const {
     tgl,
     pelamar,

@@ -3,13 +3,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { KeyRound } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { hashid } from '@/lib/hashid';
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 
 import { Button } from '@/components/ui/button';
@@ -34,6 +36,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 
 import { userService } from '@/services/user.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TChangePasswordUser, TSchemaUsers } from '@/types/users.type';
 const FormSchema = z
   .object({
@@ -65,9 +68,8 @@ export function EditModalPasswordUser({ users }: { users: TSchemaUsers }) {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setOpen(false);
     },
-    onError: () => {
-      toast.error('Edit Password Pengguna Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Edit Password', error),
   });
 
   const handleUpdate = React.useCallback(

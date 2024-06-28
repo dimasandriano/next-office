@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useDebounce, useElementSize } from 'usehooks-ts';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
+import { UserSchemaZod } from '@/lib/zod/user.schemaZod';
 import getNextPageParam from '@/hooks/getNextPageParam';
 
 import useUserColumn from '@/components/columns/user.column';
@@ -41,6 +45,7 @@ import { ERole } from '@/enums/role.enum';
 import { divisiService } from '@/services/divisi.service';
 import { userService } from '@/services/user.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaUsers } from '@/types/users.type';
 
@@ -72,17 +77,19 @@ export default function Page() {
 
   const form = useForm<TSchemaUsers>({
     mode: 'all',
+    resolver: zodResolver(UserSchemaZod),
   });
-  const { mutate: mutateCreateUser } = useMutation({
+  const { mutate: mutateCreateUser, isPending: isPendingCreate } = useMutation({
     mutationKey: ['create-user'],
     mutationFn: (data: TSchemaUsers) => userService.createUser(data),
     onSuccess: () => {
       toast.success('Pengguna Berhasil Bertambah');
       refetch();
+      form.reset();
+      setShowCreateModal(false);
     },
-    onError: () => {
-      toast.error('Pengguna Gagal Bertambah');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Membuat Pengguna', error),
   });
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
@@ -271,11 +278,14 @@ export default function Page() {
                     Close
                   </Button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <Button type='submit' variant='default' className='flex-1'>
-                    Simpan
-                  </Button>
-                </DialogClose>
+                <Button
+                  type='submit'
+                  variant='default'
+                  className='flex-1'
+                  disabled={isPendingCreate}
+                >
+                  Simpan
+                </Button>
               </DialogFooter>
             </form>
           </Form>

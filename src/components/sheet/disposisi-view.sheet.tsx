@@ -1,11 +1,13 @@
 'use client';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -44,6 +46,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { disposisiService } from '@/services/disposisi.service';
 import { divisiService } from '@/services/divisi.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDisposisi } from '@/types/disposisi.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 
@@ -76,9 +79,8 @@ export function DisposisiViewSheet({ disposisi, type }: TProps) {
         queryClient.invalidateQueries({ queryKey: ['disposisi'] });
         setOpen(false);
       },
-      onError: () => {
-        toast.error('Gagal Update Disposisi');
-      },
+      onError: (error: AxiosError<AxiosResError>) =>
+        toastError('Gagal Update Disposisi', error),
     });
 
   const onSubmit = useCallback(() => {

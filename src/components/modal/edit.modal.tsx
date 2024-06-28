@@ -3,11 +3,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { PenBox } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { DivisiSchemaZod } from '@/lib/zod/divisi.schemaZod';
 import { KategoriSchemaZod } from '@/lib/zod/kategori.schemaZod';
@@ -36,6 +38,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { divisiService } from '@/services/divisi.service';
 import { kategoriService } from '@/services/kategori.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaKategori } from '@/types/kategori.type';
 
@@ -81,9 +84,8 @@ export function EditModal({ kategori, divisi }: TEditModal) {
       queryClient.invalidateQueries({ queryKey: ['kategori'] });
       setOpen(false);
     },
-    onError: () => {
-      toast.error('Edit Kategori Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Edit Kategori Gagal', error),
   });
   const { mutate: updateDivisi, isPending: isLoadingDivisi } = useMutation({
     mutationKey: ['update-divisi'],
@@ -94,9 +96,8 @@ export function EditModal({ kategori, divisi }: TEditModal) {
       queryClient.invalidateQueries({ queryKey: ['divisi'] });
       setOpen(false);
     },
-    onError: () => {
-      toast.error('Edit Divisi Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Edit Divisi Gagal', error),
   });
 
   const handleUpdate = React.useCallback(

@@ -2,11 +2,13 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { PenBox } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 
 import { Button } from '@/components/ui/button';
@@ -40,6 +42,7 @@ import { ERole } from '@/enums/role.enum';
 import { divisiService } from '@/services/divisi.service';
 import { userService } from '@/services/user.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaUsers } from '@/types/users.type';
 
@@ -66,9 +69,8 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
       toast.success('Edit Pengguna Berhasil');
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
-    onError: () => {
-      toast.error('Edit Pengguna Gagal');
-    },
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Edit Pengguna', error),
   });
 
   const handleUpdate = React.useCallback(

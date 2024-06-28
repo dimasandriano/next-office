@@ -1,10 +1,11 @@
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
-import { UnauthorizedError } from '@/lib/exceptions';
+import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 import useVerifyJwt from '@/hooks/useVerifyJwt';
 
 import { TSchemaSurat } from '@/types/surat.type';
@@ -20,15 +21,8 @@ export async function POST(request: NextRequest) {
   if (!verify) return UnauthorizedError();
   const body: TSchemaSurat = await request.json();
   const result = createSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        error: result.error.issues,
-      },
-      { status: 400 },
-    );
-  }
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
 
   const {
     no_surat,

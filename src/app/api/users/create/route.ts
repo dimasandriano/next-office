@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
     return ForbiddenError('Only superadmin can create superadmin');
 
   const result = registerSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
 
   const checkUsername = await db.query.users.findFirst({
     where: eq(users.username, username),

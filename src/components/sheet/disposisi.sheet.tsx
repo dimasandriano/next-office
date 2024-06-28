@@ -1,11 +1,13 @@
 'use client';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronsUpDown } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +48,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { disposisiService } from '@/services/disposisi.service';
 import { divisiService } from '@/services/divisi.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaDisposisi } from '@/types/disposisi.type';
 import { TSchemaDivisi } from '@/types/divisi.type';
 import { TSchemaLamaran } from '@/types/lamaran.type';
@@ -79,9 +82,8 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
         queryClient.invalidateQueries({ queryKey: ['surat'] });
         setOpen(false);
       },
-      onError: () => {
-        toast.error('Gagal Disposisi');
-      },
+      onError: (error: AxiosError<AxiosResError>) =>
+        toastError('Gagal Membuat Disposisi', error),
     });
   const { mutate: mutateUpdateDisposisi, isPending: isPendingUpdateDisposisi } =
     useMutation({
@@ -95,9 +97,8 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
         queryClient.invalidateQueries({ queryKey: ['surat'] });
         setOpen(false);
       },
-      onError: () => {
-        toast.error('Gagal Update Disposisi');
-      },
+      onError: (error: AxiosError<AxiosResError>) =>
+        toastError('Gagal Update Disposisi', error),
     });
 
   const onSubmit = useCallback(() => {

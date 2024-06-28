@@ -1,13 +1,15 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import _ from 'lodash';
 import { CalendarIcon, Plus } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { FieldValues, useForm, UseFormReset } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
+import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
 import { cn } from '@/lib/utils';
 
@@ -60,6 +62,7 @@ import { EJenjang } from '@/enums/jenjang.enum';
 import { EStatus } from '@/enums/status.enum';
 import { lamaranService } from '@/services/lamaran.service';
 
+import { AxiosResError } from '@/types/axios-res-error.type';
 import { TSchemaLamaran } from '@/types/lamaran.type';
 
 export default function LamaranCreateSheet() {
@@ -86,7 +89,8 @@ export default function LamaranCreateSheet() {
       setPathFiles([]);
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
     },
-    onError: () => toast.error('Lamaran Gagal Dibuat'),
+    onError: (error: AxiosError<AxiosResError>) =>
+      toastError('Gagal Membuat Lamaran', error),
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
