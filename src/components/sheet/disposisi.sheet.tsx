@@ -187,7 +187,12 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+      <SheetTrigger
+        asChild
+        aria-controls={undefined}
+        aria-haspopup={undefined}
+        aria-expanded={undefined}
+      >
         <div>
           {surat && (
             <Button variant={surat?.disposisi ? 'default' : 'secondary'}>

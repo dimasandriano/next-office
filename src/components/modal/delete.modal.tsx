@@ -196,7 +196,12 @@ export function DeleteModal({
   }, [open]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger
+        asChild
+        aria-controls={undefined}
+        aria-haspopup={undefined}
+        aria-expanded={undefined}
+      >
         <div>
           {disposisi && (
             <Button

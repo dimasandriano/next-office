@@ -6,9 +6,11 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DisposisiViewSheet } from '@/components/sheet/disposisi-view.sheet';
+import SuratDetailSheet from '@/components/sheet/surat-detail.sheet';
 import { Badge } from '@/components/ui/badge';
 
 import { TSchemaDisposisi } from '@/types/disposisi.type';
+import { TSchemaSurat } from '@/types/surat.type';
 
 export default function useViewSuratColumn(widthTableContainer: number) {
   return React.useMemo<ColumnDef<TSchemaDisposisi>[]>(() => {
@@ -122,6 +124,14 @@ export default function useViewSuratColumn(widthTableContainer: number) {
         header: 'Aksi',
         meta: {
           sizeScale: 1,
+        },
+        cell: ({ row }) => {
+          return (
+            <SuratDetailSheet
+              data={row.original.surat as TSchemaSurat}
+              hiddenDisposisi
+            />
+          );
         },
       },
     ];

@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/drizzle/db';
+import { disposisi } from '@/lib/drizzle/schema/disposisi.schema';
 import { surat } from '@/lib/drizzle/schema/surat.schema';
 import { UnauthorizedError } from '@/lib/exceptions';
 import { hashid } from '@/lib/hashid';
@@ -32,5 +33,8 @@ export async function DELETE(
     .delete(surat)
     .where(eq(surat.id, Number(decodeId)))
     .returning();
+  if (disposisi.surat_id) {
+    await db.delete(disposisi).where(eq(disposisi.surat_id, Number(decodeId)));
+  }
   return NextResponse.json({ status: 'success', data });
 }

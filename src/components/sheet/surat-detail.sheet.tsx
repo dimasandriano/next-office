@@ -24,7 +24,13 @@ import {
 
 import { TSchemaSurat } from '@/types/surat.type';
 
-export default function SuratDetailSheet({ data }: { data: TSchemaSurat }) {
+export default function SuratDetailSheet({
+  data,
+  hiddenDisposisi = false,
+}: {
+  data: TSchemaSurat;
+  hiddenDisposisi?: boolean;
+}) {
   const files: string[] = useMemo(() => {
     if (isJsonString(data.files || '')) {
       return JSON.parse(data.files || '{}');
@@ -58,7 +64,7 @@ export default function SuratDetailSheet({ data }: { data: TSchemaSurat }) {
           <div className='border-t-2 py-3'>
             <div className='flex items-center justify-between'>
               <h1 className='text-2xl font-medium'>Detail</h1>
-              <DisposisiSheet surat={data} />
+              {!hiddenDisposisi && <DisposisiSheet surat={data} />}
             </div>
             <div className='grid grid-cols-12 gap-4'>
               <div className='col-span-3'>Tipe Surat</div>

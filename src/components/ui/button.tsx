@@ -45,6 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     { className, variant, size, asChild = false, isSidebar = false, ...props },
     ref,
   ) => {
+    const id = React.useId();
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
@@ -54,6 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         ref={ref}
         {...props}
+        aria-label={props['aria-label'] || 'button' + id}
       />
     );
   },
