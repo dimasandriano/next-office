@@ -44,11 +44,11 @@ export default function DisposisiLamaranPdf({
       <Table className='w-full *:hover:bg-background'>
         <TableRow>
           <TableCell className='w-1/2 border-2 border-black text-center'>
-            <div className='flex items-center justify-between px-3'>
+            <div className='flex items-center justify-between px-1'>
               {ESifat.enumValues.map((sifat) => (
                 <div
                   key={sifat}
-                  className='flex items-center space-x-1 space-y-0'
+                  className='flex items-center space-x-0.5 space-y-0'
                 >
                   <Checkbox disabled />
                   <Label className='font-semibold uppercase'>{sifat}</Label>
