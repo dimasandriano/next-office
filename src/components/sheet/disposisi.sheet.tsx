@@ -106,18 +106,20 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
       if (isCreateLamaran) {
         mutateCreateDisposisi({
           ...getValues(),
-          divisi_id: Number(getValues().divisi_id),
+          divisi_id: getValues().divisi_id && Number(getValues().divisi_id),
           lamaran_id: lamaran && lamaran?.id,
           surat_id: surat && surat?.id,
+          tgl_diterima: getValues().tgl_diterima && getValues().tgl_diterima,
         });
         return;
       } else {
         mutateUpdateDisposisi({
           ...getValues(),
           id: lamaran?.disposisi?.id,
-          divisi_id: Number(getValues().divisi_id),
+          divisi_id: getValues().divisi_id && Number(getValues().divisi_id),
           lamaran_id: lamaran && lamaran?.id,
           surat_id: surat && surat?.id,
+          tgl_diterima: getValues().tgl_diterima && getValues().tgl_diterima,
         });
       }
     }
@@ -125,18 +127,20 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
       if (isCreateSurat) {
         mutateCreateDisposisi({
           ...getValues(),
-          divisi_id: Number(getValues().divisi_id),
+          divisi_id: getValues().divisi_id && Number(getValues().divisi_id),
           lamaran_id: lamaran && lamaran?.id,
           surat_id: surat && surat?.id,
+          tgl_diterima: getValues().tgl_diterima && getValues().tgl_diterima,
         });
         return;
       } else {
         mutateUpdateDisposisi({
           ...getValues(),
           id: surat?.disposisi?.id,
-          divisi_id: Number(getValues().divisi_id),
+          divisi_id: getValues().divisi_id && Number(getValues().divisi_id),
           lamaran_id: lamaran && lamaran?.id,
           surat_id: surat && surat?.id,
+          tgl_diterima: getValues().tgl_diterima && getValues().tgl_diterima,
         });
       }
     }

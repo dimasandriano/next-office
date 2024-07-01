@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import * as z from 'zod';
+import { fromError } from 'zod-validation-error';
 
 import { db } from '@/lib/drizzle/db';
 import { users } from '@/lib/drizzle/schema/users.schema';
@@ -33,7 +34,8 @@ export async function PUT(
   const body = await request.json();
   const { password_new, password_confirm, password_old } = body;
   const result = changePasswordSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
 
   const { role } = useDecodedTokenJWT(request);
 

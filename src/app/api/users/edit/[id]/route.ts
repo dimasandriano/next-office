@@ -16,6 +16,7 @@ const editSchema = createInsertSchema(users, {
   password: z.nullable(z.string().min(3).max(200)).optional(),
 });
 import bcrypt from 'bcryptjs';
+import { fromError } from 'zod-validation-error';
 
 import { BadRequestError, UnauthorizedError } from '@/lib/exceptions';
 
@@ -29,7 +30,8 @@ export async function PUT(
   if (!verify) return UnauthorizedError();
   const body: TSchemaUsers = await request.json();
   const result = editSchema.safeParse(body);
-  if (!result.success) return BadRequestError(result.error);
+  if (!result.success)
+    return BadRequestError(fromError(result.error).toString());
   const { full_name, username, password, role, is_active, divisi_id } = body;
 
   const userID = await db.query.users.findFirst({
