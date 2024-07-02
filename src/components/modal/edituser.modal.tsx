@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { PenBox } from 'lucide-react';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 
 import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
+import { UserSchemaZod } from '@/lib/zod/user.schemaZod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -50,6 +52,7 @@ type TUpdateUser = Omit<TSchemaUsers, 'is_active'> & { is_active: string };
 export function EditModalUser({ users }: { users: TSchemaUsers }) {
   const form = useForm<TUpdateUser>({
     mode: 'all',
+    resolver: zodResolver(UserSchemaZod),
   });
   const { setValue, reset } = form;
 
