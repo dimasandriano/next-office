@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useDecodedTokenJWTClient } from '@/hooks/useDecodedTokenJWT';
 
@@ -19,6 +19,12 @@ import { Button } from '@/components/ui/button';
 export default function Sidebar() {
   const pathname = usePathname();
   const decoded = useDecodedTokenJWTClient();
+  const [showUserPage, setShowUserPage] = React.useState(false);
+  useEffect(() => {
+    if (decoded.role === 'superadmin') {
+      setShowUserPage(true);
+    }
+  }, [decoded.role]);
   return (
     <div className='h-screen w-full space-y-5 p-3'>
       <div className='text-center text-2xl font-bold'>E-SURAT</div>
@@ -74,7 +80,7 @@ export default function Sidebar() {
               Kelola Divisi
             </Link>
           </Button>
-          {decoded?.role === 'superadmin' && (
+          {showUserPage && (
             <Button
               variant={pathname === '/e-surat/users' ? 'default' : 'outline'}
               asChild
