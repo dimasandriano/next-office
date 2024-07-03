@@ -108,7 +108,12 @@ export function DisposisiViewSheet({ disposisi, type }: TProps) {
   }, [disposisi, setValue]);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+      <SheetTrigger
+        asChild
+        aria-controls={undefined}
+        aria-haspopup={undefined}
+        aria-expanded={undefined}
+      >
         <Badge variant='default' className='cursor-pointer'>
           Lihat Disposisi
         </Badge>

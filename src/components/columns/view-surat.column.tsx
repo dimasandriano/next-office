@@ -113,7 +113,7 @@ export default function useViewSuratColumn(widthTableContainer: number) {
         id: 'disposisi',
         header: 'Disposisi',
         meta: {
-          sizeScale: 3,
+          sizeScale: 4,
         },
         cell: ({ row }) => {
           return <DisposisiViewSheet disposisi={row.original} type='surat' />;
