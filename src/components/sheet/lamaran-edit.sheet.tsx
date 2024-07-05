@@ -26,6 +26,7 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -347,6 +348,9 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
                                             />
                                           </FormControl>
                                           <FormMessage />
+                                          <FormDescription>
+                                            Kosongkan jika tidak ada
+                                          </FormDescription>
                                         </FormItem>
                                       )}
                                     />
@@ -396,10 +400,12 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
                                       name={'ipk' + education}
                                       render={({ field }) => (
                                         <FormItem>
-                                          <FormLabel>IPK</FormLabel>
+                                          <FormLabel>
+                                            IPK / Nilai Rata-rata Ujian Akhir
+                                          </FormLabel>
                                           <FormControl>
                                             <Input
-                                              placeholder='Masukkan IPK'
+                                              placeholder='Masukkan IPK / Nilai Rata-rata Ujian Akhir'
                                               type='number'
                                               {...field}
                                             />

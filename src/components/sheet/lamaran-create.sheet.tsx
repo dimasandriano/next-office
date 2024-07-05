@@ -25,6 +25,7 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -307,6 +308,9 @@ export default function LamaranCreateSheet() {
                                           />
                                         </FormControl>
                                         <FormMessage />
+                                        <FormDescription>
+                                          Kosongkan jika tidak ada
+                                        </FormDescription>
                                       </FormItem>
                                     )}
                                   />
@@ -354,10 +358,12 @@ export default function LamaranCreateSheet() {
                                     name={'ipk' + education}
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>IPK</FormLabel>
+                                        <FormLabel>
+                                          IPK / Nilai Rata-Rata Ujian Akhir
+                                        </FormLabel>
                                         <FormControl>
                                           <Input
-                                            placeholder='Masukkan IPK'
+                                            placeholder='Masukkan IPK / Nilai  Rata-Rata Ujian Akhir'
                                             type='number'
                                             {...field}
                                           />

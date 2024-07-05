@@ -118,7 +118,7 @@ export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
                       <div className='col-span-9'>: {data?.gelar || '-'}</div>
                     </div>
                     <div className='grid grid-cols-12 gap-4'>
-                      <div className='col-span-3'>IPK</div>
+                      <div className='col-span-3'>IPK / Nilai Rata-rata </div>
                       <div className='col-span-9'>: {data?.ipk || '-'}</div>
                     </div>
                     <div className='grid grid-cols-12 gap-4'>
