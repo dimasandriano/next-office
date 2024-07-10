@@ -59,7 +59,7 @@ export function EditModalPasswordUser({ users }: { users: TSchemaUsers }) {
   });
   const { handleSubmit, clearErrors } = form;
 
-  const { mutate: updatePasswordUser } = useMutation({
+  const { mutate: updatePasswordUser, isPending } = useMutation({
     mutationKey: ['update-password-user'],
     mutationFn: (data: TChangePasswordUser) =>
       userService.changePasswordUser(data),
@@ -155,7 +155,12 @@ export function EditModalPasswordUser({ users }: { users: TSchemaUsers }) {
                   Close
                 </Button>
               </DialogClose>
-              <Button type='submit' variant='default' className='flex-1'>
+              <Button
+                type='submit'
+                variant='default'
+                className='flex-1'
+                disabled={isPending}
+              >
                 Simpan
               </Button>
             </DialogFooter>

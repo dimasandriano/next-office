@@ -50,6 +50,7 @@ import { TSchemaUsers } from '@/types/users.type';
 
 type TUpdateUser = Omit<TSchemaUsers, 'is_active'> & { is_active: string };
 export function EditModalUser({ users }: { users: TSchemaUsers }) {
+  const [open, setOpen] = React.useState(false);
   const form = useForm<TUpdateUser>({
     mode: 'all',
     resolver: zodResolver(UserSchemaZod),
@@ -65,12 +66,13 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
     setValue('full_name', users.full_name);
   }, [reset, setValue, users]);
 
-  const { mutate: updateUser } = useMutation({
+  const { mutate: updateUser, isPending } = useMutation({
     mutationKey: ['update-user'],
     mutationFn: (data: Partial<TSchemaUsers>) => userService.updateUser(data),
     onSuccess: () => {
       toast.success('Edit Pengguna Berhasil');
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      setOpen(false);
     },
     onError: (error: AxiosError<AxiosResError>) =>
       toastError('Gagal Edit Pengguna', error),
@@ -91,7 +93,7 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
     queryFn: () => divisiService.getAllDivisiSelection(),
   });
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size='icon' variant='default'>
           <PenBox />
@@ -217,11 +219,14 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
                   Close
                 </Button>
               </DialogClose>
-              <DialogClose asChild>
-                <Button type='submit' variant='default' className='flex-1'>
-                  Simpan
-                </Button>
-              </DialogClose>
+              <Button
+                type='submit'
+                variant='default'
+                className='flex-1'
+                disabled={isPending}
+              >
+                Simpan
+              </Button>
             </DialogFooter>
           </form>
         </Form>
