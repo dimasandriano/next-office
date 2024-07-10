@@ -86,6 +86,7 @@ export function DisposisiViewSheet({ disposisi, type }: TProps) {
   const onSubmit = useCallback(() => {
     mutateUpdateDisposisi({
       id: Number(getValues().id),
+      isi: getValues().isi,
       note_penerima: getValues().note_penerima,
       tgl_diterima: getValues().tgl_diterima,
     });
@@ -207,11 +208,7 @@ export function DisposisiViewSheet({ disposisi, type }: TProps) {
                 <FormItem>
                   <FormLabel>Isi Disposisi</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder='Masukkan isi disposisi'
-                      {...field}
-                      disabled
-                    />
+                    <Textarea placeholder='Masukkan isi disposisi' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
