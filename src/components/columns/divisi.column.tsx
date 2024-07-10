@@ -35,7 +35,7 @@ export default function useDivisiColumn(widthTableContainer: number) {
         id: 'keterangan_divisi',
         header: 'Keterangan',
         meta: {
-          sizeScale: 4,
+          sizeScale: 8,
         },
         cell: ({ row }) => {
           return row.original.keterangan;

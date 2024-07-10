@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
-import { UserSchemaZod } from '@/lib/zod/user.schemaZod';
+import { UserEditSchemaZod } from '@/lib/zod/user.schemaZod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -53,9 +53,9 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
   const [open, setOpen] = React.useState(false);
   const form = useForm<TUpdateUser>({
     mode: 'all',
-    resolver: zodResolver(UserSchemaZod),
+    resolver: zodResolver(UserEditSchemaZod),
   });
-  const { setValue, reset } = form;
+  const { setValue, reset, clearErrors } = form;
 
   React.useEffect(() => {
     setValue('id', users.id);
@@ -92,6 +92,10 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
     queryKey: ['divisi'],
     queryFn: () => divisiService.getAllDivisiSelection(),
   });
+
+  React.useEffect(() => {
+    clearErrors();
+  }, [clearErrors, open]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

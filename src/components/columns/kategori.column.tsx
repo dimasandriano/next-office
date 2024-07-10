@@ -35,7 +35,7 @@ export default function useKategoriColumn(widthTableContainer: number) {
         id: 'keterangan',
         header: 'Keterangan',
         meta: {
-          sizeScale: 4,
+          sizeScale: 8,
         },
         cell: ({ row }) => {
           return row.original.keterangan;
