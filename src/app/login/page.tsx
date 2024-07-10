@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 
 import { toastError } from '@/lib/sonner/toast-error.sonner';
 import { ZloginSchema } from '@/lib/zod/auth.schemaZod';
+import { useDecodedTokenJWTClient } from '@/hooks/useDecodedTokenJWT';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -46,7 +47,12 @@ export default function Page() {
       Cookies.set('token', data?.token, {
         expires: 1,
       });
-      router.push('/e-surat');
+      const decoded = useDecodedTokenJWTClient();
+      if (decoded?.role !== 'user') {
+        router.push('/e-surat');
+      } else {
+        router.push('/view/e-surat');
+      }
     },
   });
   const onSubmit = (data: TLogin) => mutate(data);
