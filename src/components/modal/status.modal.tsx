@@ -15,12 +15,12 @@ import { EStatus } from '@/enums/status.enum';
 export default function StatusModal() {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger aria-label='Status'>
         <CircleHelp size={16} />
       </DialogTrigger>
       <DialogContent className='max-w-xl'>
         <DialogHeader className='mb-5'>
-          <DialogTitle>Sifat Surat</DialogTitle>
+          <DialogTitle>Status Surat</DialogTitle>
         </DialogHeader>
         <div className='grid grid-cols-4'>
           <div className='col-span-1'>

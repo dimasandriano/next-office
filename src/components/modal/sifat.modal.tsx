@@ -13,7 +13,7 @@ import {
 export default function SifatModal() {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger aria-label='Sifat'>
         <CircleHelp size={16} />
       </DialogTrigger>
       <DialogContent className='max-w-xl'>
