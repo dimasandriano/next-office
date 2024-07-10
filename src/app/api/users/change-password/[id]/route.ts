@@ -66,8 +66,7 @@ export async function PUT(
     .set({
       password: await bcrypt.hash(password_new, 10),
     })
-    .where(eq(users.id, Number(decodeId)))
-    .returning();
+    .where(eq(users.id, Number(decodeId)));
 
   return NextResponse.json({ status: 'success', data });
 }

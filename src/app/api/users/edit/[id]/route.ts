@@ -57,15 +57,15 @@ export async function PUT(
         is_active,
         divisi_id,
       })
-      .where(eq(users.id, Number(id)))
-      .returning();
+      .where(eq(users.id, Number(id)));
+
     return NextResponse.json({ status: 'success', data });
   }
 
   const data = await db
     .update(users)
     .set({ full_name, username, role, is_active, divisi_id })
-    .where(eq(users.id, Number(id)))
-    .returning();
+    .where(eq(users.id, Number(id)));
+
   return NextResponse.json({ status: 'success', data });
 }

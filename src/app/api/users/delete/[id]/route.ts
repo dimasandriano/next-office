@@ -36,10 +36,7 @@ export async function DELETE(
     return ForbiddenError('Admin tidak boleh menghapus superadmin');
   }
 
-  const data = await db
-    .delete(users)
-    .where(eq(users.id, Number(decodeId)))
-    .returning();
+  const data = await db.delete(users).where(eq(users.id, Number(decodeId)));
 
   return NextResponse.json({ status: 'success', data });
 }

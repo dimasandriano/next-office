@@ -50,18 +50,15 @@ export async function POST(request: NextRequest) {
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   try {
-    const data = await db
-      .insert(users)
-      .values({
-        full_name,
-        username,
-        password: hashedPassword,
-        role,
-        created_by,
-        is_active,
-        divisi_id,
-      })
-      .returning();
+    const data = await db.insert(users).values({
+      full_name,
+      username,
+      password: hashedPassword,
+      role,
+      created_by,
+      is_active,
+      divisi_id,
+    });
 
     return NextResponse.json({ status: 'success', data });
   } catch {
