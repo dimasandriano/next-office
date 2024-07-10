@@ -368,6 +368,7 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
                       : undefined
                 }
                 isDisposisi
+                setOpen={setOpen}
               />
               <Button
                 type='submit'

@@ -3,7 +3,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { TrashIcon } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { toast } from 'sonner';
 
 import { hashid } from '@/lib/hashid';
@@ -46,6 +53,7 @@ interface TDeleteModal {
   lamaran?: TSchemaLamaran;
   disposisi?: TSchemaDisposisi;
   isDisposisi?: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 /**
@@ -60,6 +68,7 @@ export function DeleteModal({
   lamaran,
   disposisi,
   isDisposisi = false,
+  setOpen: setOpenSheet,
 }: TDeleteModal) {
   const [open, setOpen] = useState(false);
   const { mutate: deleteSurat } = useMutation({
@@ -120,6 +129,9 @@ export function DeleteModal({
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['lamaran'] });
       queryClient.invalidateQueries({ queryKey: ['surat'] });
+      if (isDisposisi && setOpenSheet) {
+        setOpenSheet(false);
+      }
     },
     onError: (error: AxiosError<AxiosResError>) =>
       toastError('Hapus Disposisi Gagal', error),
