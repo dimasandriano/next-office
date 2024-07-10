@@ -6,6 +6,8 @@ import React from 'react';
 import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
+import SifatModal from '@/components/modal/sifat.modal';
+import StatusModal from '@/components/modal/status.modal';
 import SuratDetailSheet from '@/components/sheet/surat-detail.sheet';
 import SuratEditSheet from '@/components/sheet/surat-edit.sheet';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +82,11 @@ export default function useSuratColumn(widthTableContainer: number) {
       },
       {
         id: 'status',
-        header: 'Status Surat',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            Status Surat <StatusModal />
+          </div>
+        ),
         meta: {
           sizeScale: 4,
         },
@@ -94,7 +100,11 @@ export default function useSuratColumn(widthTableContainer: number) {
       },
       {
         id: 'sifat',
-        header: 'Sifat Surat',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            Sifat Surat <SifatModal />
+          </div>
+        ),
         meta: {
           sizeScale: 4,
         },

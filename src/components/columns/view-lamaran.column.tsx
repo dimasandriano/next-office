@@ -5,6 +5,7 @@ import React from 'react';
 
 import { generateSize } from '@/lib/tanstack/column';
 
+import StatusModal from '@/components/modal/status.modal';
 import { DisposisiViewSheet } from '@/components/sheet/disposisi-view.sheet';
 import LamaranDetailSheet from '@/components/sheet/lamaran-detail.sheet';
 import { Badge } from '@/components/ui/badge';
@@ -73,7 +74,11 @@ export default function useViewLamaranColumn(widthTableContainer: number) {
       },
       {
         id: 'status',
-        header: 'Status',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            Status <StatusModal />
+          </div>
+        ),
         meta: {
           sizeScale: 4,
         },

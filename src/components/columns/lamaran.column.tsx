@@ -7,6 +7,7 @@ import { generateSize } from '@/lib/tanstack/column';
 
 import { DeleteModal } from '@/components/modal/delete.modal';
 import DisposisiCetakModal from '@/components/modal/disposisi-cetak.modal';
+import StatusModal from '@/components/modal/status.modal';
 import { DisposisiSheet } from '@/components/sheet/disposisi.sheet';
 import LamaranDetailSheet from '@/components/sheet/lamaran-detail.sheet';
 import LamaranEditSheet from '@/components/sheet/lamaran-edit.sheet';
@@ -71,7 +72,11 @@ export default function useLamaranColumn(widthTableContainer: number) {
       },
       {
         id: 'status',
-        header: 'Status Surat',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            Status Surat <StatusModal />
+          </div>
+        ),
         meta: {
           sizeScale: 4,
         },
