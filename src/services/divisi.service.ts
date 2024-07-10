@@ -10,8 +10,10 @@ export const divisiService = {
     return data;
   },
 
-  getAllDivisiSelection: async () => {
-    const { data } = await instance.get('/divisi/list');
+  getAllDivisiSelection: async (params?: TParams) => {
+    const { data } = await instance.get('/divisi/list', {
+      params,
+    });
     return data.data;
   },
 

@@ -93,7 +93,10 @@ export default function Page() {
   });
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
-    queryFn: () => divisiService.getAllDivisiSelection(),
+    queryFn: () =>
+      divisiService.getAllDivisiSelection({
+        take: 100,
+      }),
   });
   const onSubmit = React.useCallback(
     (data: any) => {

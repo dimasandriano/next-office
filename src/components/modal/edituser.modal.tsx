@@ -90,7 +90,10 @@ export function EditModalUser({ users }: { users: TSchemaUsers }) {
   );
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
-    queryFn: () => divisiService.getAllDivisiSelection(),
+    queryFn: () =>
+      divisiService.getAllDivisiSelection({
+        take: 100,
+      }),
   });
 
   React.useEffect(() => {

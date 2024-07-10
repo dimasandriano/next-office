@@ -156,7 +156,10 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
 
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
-    queryFn: () => divisiService.getAllDivisiSelection(),
+    queryFn: () =>
+      divisiService.getAllDivisiSelection({
+        take: 100,
+      }),
     enabled: open,
   });
   useEffect(() => {

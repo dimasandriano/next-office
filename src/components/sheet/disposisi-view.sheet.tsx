@@ -93,7 +93,10 @@ export function DisposisiViewSheet({ disposisi, type }: TProps) {
 
   const { data: dataDivisi } = useQuery<TSchemaDivisi[]>({
     queryKey: ['divisi'],
-    queryFn: () => divisiService.getAllDivisiSelection(),
+    queryFn: () =>
+      divisiService.getAllDivisiSelection({
+        take: 100,
+      }),
   });
 
   useEffect(() => {
