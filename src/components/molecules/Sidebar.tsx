@@ -7,6 +7,7 @@ import {
   SquareStack,
   Users,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
@@ -16,6 +17,7 @@ import { useDecodedTokenJWTClient } from '@/hooks/useDecodedTokenJWT';
 import LogoutModal from '@/components/modal/logout.modal';
 import { Button } from '@/components/ui/button';
 
+import Logo from '~/images/unisba.png';
 export default function Sidebar() {
   const pathname = usePathname();
   const decoded = useDecodedTokenJWTClient();
@@ -27,7 +29,9 @@ export default function Sidebar() {
   }, [decoded.role]);
   return (
     <div className='h-screen w-full space-y-5 p-3'>
-      <div className='text-center text-2xl font-bold'>E-SURAT</div>
+      <div className='flex items-center justify-center gap-3'>
+        <Image src={Logo} alt='Logo' width={40} height={40} />
+      </div>
       <div className='flex h-[calc(100vh-75px)] flex-col justify-between'>
         <div className='flex flex-col justify-start gap-5'>
           <Button

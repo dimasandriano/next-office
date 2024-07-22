@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -30,6 +31,8 @@ import { authService } from '@/services/auth.service';
 
 import { TLogin } from '@/types/auth.type';
 import { AxiosResError } from '@/types/axios-res-error.type';
+
+import Logo from '~/images/unisba.png';
 
 export default function Page() {
   const router = useRouter();
@@ -63,7 +66,8 @@ export default function Page() {
           onSubmit={handleSubmit(onSubmit)}
           className='w-[500px] space-y-3 rounded-lg border-2 p-5 shadow-sm'
         >
-          <div>
+          <div className='flex flex-col items-center justify-center gap-3'>
+            <Image src={Logo} alt='Logo' width={100} height={100} />
             <h2 className='text-center text-3xl font-bold'>E-SURAT</h2>
           </div>
           <FormField

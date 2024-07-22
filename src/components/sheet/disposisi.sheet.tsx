@@ -1,4 +1,5 @@
 'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { format } from 'date-fns';
@@ -6,6 +7,7 @@ import { CalendarIcon, ChevronsUpDown } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { toastError } from '@/lib/sonner/toast-error.sonner';
 import queryClient from '@/lib/tanstack';
@@ -59,6 +61,13 @@ type TProps = {
   surat?: TSchemaSurat;
 };
 
+const schemaDisposisi = z.object({
+  tgl_diterima: z
+    .any()
+    .refine((value) => value, 'Tanggal diterima wajib diisi'),
+  divisi_id: z.string().refine((value) => value, 'Divisi wajib diisi'),
+});
+
 export function DisposisiSheet({ lamaran, surat }: TProps) {
   const [open, setOpen] = useState(false);
   const [openSelect, setOpenSelect] = useState(false);
@@ -67,6 +76,7 @@ export function DisposisiSheet({ lamaran, surat }: TProps) {
 
   const form = useForm({
     mode: 'onChange',
+    resolver: zodResolver(schemaDisposisi),
   });
   const { handleSubmit, reset, getValues, setValue } = form;
 

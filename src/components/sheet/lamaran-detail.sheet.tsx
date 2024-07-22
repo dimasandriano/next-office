@@ -30,6 +30,7 @@ type TPendidikan = {
   ipk: string;
   prodi: string;
   gelar: string;
+  ijazah: string;
 };
 
 export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
@@ -120,6 +121,10 @@ export default function LamaranDetailSheet({ data }: { data: TSchemaLamaran }) {
                     <div className='grid grid-cols-12 gap-4'>
                       <div className='col-span-3'>IPK / Nilai Rata-rata </div>
                       <div className='col-span-9'>: {data?.ipk || '-'}</div>
+                    </div>
+                    <div className='grid grid-cols-12 gap-4'>
+                      <div className='col-span-3'>No Ijazah</div>
+                      <div className='col-span-9'>: {data?.ijazah || '-'}</div>
                     </div>
                     <div className='grid grid-cols-12 gap-4'>
                       <div className='col-span-3'>Tanggal Lulus</div>

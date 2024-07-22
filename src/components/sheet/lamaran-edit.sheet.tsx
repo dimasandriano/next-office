@@ -125,6 +125,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
         setValue(`jenjang${index + 1}`, item.jenjang);
         setValue(`gelar${index + 1}`, item.gelar);
         setValue(`ipk${index + 1}`, item.ipk);
+        setValue(`ijazah${index + 1}`, item.ijazah);
         setValue(`tgllulus${index + 1}`, item.tgllulus);
       });
     }
@@ -145,6 +146,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
       grouped.jenjang,
       grouped.gelar,
       grouped.ipk,
+      grouped.ijazah,
       grouped.tgllulus,
       (
         [_universitasKey, universitasValue],
@@ -152,6 +154,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
         [_jenjangKey, jenjangValue],
         [_gelarKey, gelarValue],
         [_ipkKey, ipkValue],
+        [_ijazahKey, ijazahValue],
         [_tgllulusKey, tgllulusValue],
       ) => ({
         universitas: universitasValue,
@@ -159,6 +162,7 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
         jenjang: jenjangValue,
         gelar: gelarValue,
         ipk: ipkValue,
+        ijazah: ijazahValue,
         tgllulus: tgllulusValue,
       }),
     );
@@ -416,6 +420,22 @@ export default function LamaranEditSheet({ data }: { data: TSchemaLamaran }) {
                                     />
                                     <FormField
                                       control={form.control}
+                                      name={'ijazah' + education}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>No Ijazah</FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              placeholder='Masukkan No Ijazah'
+                                              {...field}
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
                                       name={'tgllulus' + education}
                                       render={({ field }) => (
                                         <FormItem className='flex flex-col'>
@@ -644,7 +664,7 @@ const Footer = ({
             variant='secondary'
             type='button'
           >
-            Prev
+            Kembali
           </Button>
           <Button
             size='sm'
@@ -652,7 +672,7 @@ const Footer = ({
             type='button'
             disabled={isLoading}
           >
-            {isLastStep ? 'Submit' : isOptionalStep ? 'Skip' : 'Next'}
+            {isLastStep ? 'Simpan' : isOptionalStep ? 'Lewati' : 'Lanjutkan'}
           </Button>
         </div>
       </div>

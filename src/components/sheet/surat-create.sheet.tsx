@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { format, isDate } from 'date-fns';
+import { format, getMonth, getYear, isDate } from 'date-fns';
 import { CalendarIcon, Plus } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { FieldValues, useForm, UseFormReset } from 'react-hook-form';
@@ -100,6 +100,14 @@ export default function SuratCreateSheet() {
       kategori_id: Number(watch('kategori_id')),
       jam: isDate(watch('jam')) ? format(watch('jam'), 'HH:mm') : undefined,
       files: JSON.stringify(pathFiles),
+      no_surat:
+        getValues().tipe === 'surat_keluar'
+          ? getValues().no_surat +
+            '/UNISBA/' +
+            (getMonth(new Date()) + 1) +
+            '/' +
+            getYear(new Date())
+          : getValues().no_surat,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -198,6 +206,16 @@ export default function SuratCreateSheet() {
                                 <Input
                                   placeholder='Masukkan No Surat'
                                   {...field}
+                                  suffix={
+                                    watch('tipe') === 'surat_keluar' ? (
+                                      <span className='font-bold'>
+                                        /UNISBA/{getMonth(new Date()) + 1}/
+                                        {getYear(new Date())}
+                                      </span>
+                                    ) : (
+                                      <></>
+                                    )
+                                  }
                                 />
                               </FormControl>
                               <FormMessage />
@@ -638,7 +656,7 @@ const Footer = ({
             reset();
           }}
         >
-          Reset Form
+          Isi Ulang Form
         </Button>
         <div className='flex gap-2'>
           <Button
@@ -648,7 +666,7 @@ const Footer = ({
             variant='secondary'
             type='button'
           >
-            Prev
+            Kembali
           </Button>
           <Button
             size='sm'
@@ -656,7 +674,7 @@ const Footer = ({
             type='button'
             disabled={isLoading}
           >
-            {isLastStep ? 'Submit' : isOptionalStep ? 'Skip' : 'Next'}
+            {isLastStep ? 'Simpan' : isOptionalStep ? 'Lewati' : 'Lanjutkan'}
           </Button>
         </div>
       </div>

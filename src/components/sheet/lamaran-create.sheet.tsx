@@ -106,6 +106,7 @@ export default function LamaranCreateSheet() {
       grouped.jenjang,
       grouped.gelar,
       grouped.ipk,
+      grouped.ijazah,
       grouped.tgllulus,
       (
         [_universitasKey, universitasValue],
@@ -113,6 +114,7 @@ export default function LamaranCreateSheet() {
         [_jenjangKey, jenjangValue],
         [_gelarKey, gelarValue],
         [_ipkKey, ipkValue],
+        [_ijazahKey, ijazahValue],
         [_tgllulusKey, tgllulusValue],
       ) => ({
         universitas: universitasValue,
@@ -120,6 +122,7 @@ export default function LamaranCreateSheet() {
         jenjang: jenjangValue,
         gelar: gelarValue,
         ipk: ipkValue,
+        ijazah: ijazahValue,
         tgllulus: tgllulusValue,
       }),
     );
@@ -374,6 +377,22 @@ export default function LamaranCreateSheet() {
                                   />
                                   <FormField
                                     control={form.control}
+                                    name={'ijazah' + education}
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>No Ijazah</FormLabel>
+                                        <FormControl>
+                                          <Input
+                                            placeholder='Masukkan No Ijazah'
+                                            {...field}
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  <FormField
+                                    control={form.control}
                                     name={'tgllulus' + education}
                                     render={({ field }) => (
                                       <FormItem className='flex flex-col'>
@@ -603,7 +622,7 @@ const Footer = ({
             reset();
           }}
         >
-          Reset Form
+          Isi Ulang Form
         </Button>
         <div className='flex gap-2'>
           <Button
@@ -613,7 +632,7 @@ const Footer = ({
             variant='secondary'
             type='button'
           >
-            Prev
+            Kembali
           </Button>
           <Button
             size='sm'
@@ -621,7 +640,7 @@ const Footer = ({
             type='button'
             disabled={isLoading}
           >
-            {isLastStep ? 'Submit' : isOptionalStep ? 'Skip' : 'Next'}
+            {isLastStep ? 'Simpan' : isOptionalStep ? 'Lewati' : 'Lanjutkan'}
           </Button>
         </div>
       </div>
