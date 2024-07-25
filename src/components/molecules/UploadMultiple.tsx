@@ -144,7 +144,7 @@ const FileUploaderMultiple = ({
             <Upload className='text-default-500 h-6 w-6' />
           </div>
           <h4 className=' mb-1 text-2xl font-medium text-card-foreground/80'>
-            Drop files here or click to upload.
+            Letakkan File Disini atau Klik Upload.
           </h4>
         </div>
       </div>
@@ -160,14 +160,14 @@ const FileUploaderMultiple = ({
           <div>{fileList}</div>
           <div className=' flex justify-end space-x-2'>
             <Button variant='destructive' onClick={handleRemoveAllFiles}>
-              Reset Semua
+              Reset Semua File
             </Button>
             <Button
               type='button'
               disabled={isLoading}
               onClick={handleUploadFiles}
             >
-              Upload Files
+              Unggah File
             </Button>
           </div>
         </div>
